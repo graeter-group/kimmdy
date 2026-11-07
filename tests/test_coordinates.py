@@ -11,9 +11,10 @@ from kimmdy.recipe import Bind, Break, Place
 from kimmdy.parsing import read_top, write_top
 from kimmdy.constants import REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
-from kimmdy.topology.atomic import Angle, Bond, BondType, Dihedral, Pair
+from kimmdy.topology.atomic import Angle, Atom, Bond, BondType, Dihedral, Pair
 from kimmdy.topology.topology import Topology
 from kimmdy.coordinates import (
+    AffectedInteractions,
     MoleculeTypeMerger,
     merge_top_slow_growth,
     get_explicit_or_type,
@@ -76,6 +77,55 @@ def test_implicit_interactions_ignore_generated_pairs():
     merger.ff = SimpleNamespace(defaults=[["1", "2", "yes", "0.5", "0.8333"]])
     merger.mol_a.bonds[("1", "2")] = Bond("1", "2", funct="1")
     assert merger._implicit_interactions("2") == ["bond 1-2"]
+
+
+@pytest.mark.parametrize(
+    "type_a, type_b, expected",
+    [
+        ("HO", "HC", "HC"),  # the B type has an LJ size: kept
+        ("HO", "HO", "H1"),  # lands on an oxygen again: no LJ size in B
+        ("HC", "HO", "H1"),  # moves onto an oxygen: no LJ size in B
+    ],
+)
+def test_retype_transferred_h_uses_b_type(type_a, type_b, expected):
+    """State B of the relax takes the B type of a moved H, H1 only where the B type has no LJ size."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.retype_transferred_h = True
+    merger.transferred_h_type = "H1"
+    merger.ff = SimpleNamespace(
+        atomtypes={
+            "HO": SimpleNamespace(epsilon="0.00000e+00"),
+            "HC": SimpleNamespace(epsilon="6.56888e-02"),
+            "H1": SimpleNamespace(epsilon="6.56888e-02"),
+        },
+        defaults=[["1", "2", "yes", "0.5", "0.8333"]],
+    )
+    # H 2 moves from atom 1 to atom 3; merge_atoms gave it its B type
+    h_a = Atom("2", type_a, "1", "RES", "H", "2", "0.4", "1.008")
+    if type_b != type_a:
+        h_a.typeB = type_b
+    h_b = Atom("2", type_b, "1", "RES", "H", "2", "0.4", "1.008")
+    merger.mol_a = SimpleNamespace(
+        atoms={"2": h_a},
+        bonds={
+            ("1", "2"): Bond("1", "2", funct="1", c0="0.0960", c1="462750.0"),
+            ("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0"),
+        },
+        angles={},
+        proper_dihedrals={},
+        improper_dihedrals={},
+        pairs={},
+    )
+    merger.mol_b = SimpleNamespace(
+        atoms={"2": h_b},
+        bonds={("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0")},
+    )
+    merger.affected_interactions = AffectedInteractions()
+
+    merger._retype_transferred_hydrogens()
+
+    assert h_a.type == type_a  # state A keeps its type
+    assert (h_a.typeB or h_a.type) == expected
 
 
 def test_get_explicit_MultipleDihedrals(arranged_tmp_path):
