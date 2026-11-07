@@ -159,9 +159,9 @@ def test_hydrogen_identity_from_the_partner_position(amber_ff):
 
     _abstract(atoms, "HA")
     assert templates.hydrogen_identity(atoms, atoms[ca], hydrogen) == ("HA", "H1")
-    # no hydrogen position on C: HX, the type stays
+    # no hydrogen position on C: HX, the type from C (bonded to O: H1)
     c = _nr(atoms, "C")
-    assert templates.hydrogen_identity(atoms, atoms[c], hydrogen) == ("HX", "HO")
+    assert templates.hydrogen_identity(atoms, atoms[c], hydrogen) == ("HX", "H1")
     # no rtp entry
     atoms = _residue(amber_ff, "ALA", "XYZ")
     assert templates.hydrogen_identity(atoms, atoms[ca], hydrogen) is None
@@ -365,3 +365,62 @@ def test_names_come_from_the_template_whatever_the_charges(amber_ff):
     assert renamed == {h}
     assert (b[h].atom, b[h].type) == ("HA2", "H1")
     assert b[h].mass == amber_ff.atomtypes["H1"].mass
+
+
+def _hydroxyl_hydrogen() -> Atom:
+    return Atom(nr="99", type="HO", resnr="2", residue="DON", atom="HO", cgnr="99", charge="0.4")
+
+
+@pytest.mark.parametrize(
+    "residue, partner, h_type",
+    [
+        ("ALA", "C", "H1"),  # acyl C after a backbone break: bonded to O
+        ("PHE", "CG", "HA"),  # aromatic CA: the rtp entries put HA on it
+        ("PRO", "N", "H"),  # N: the rtp entries put H on it
+    ],
+)
+def test_hydrogen_without_a_template_position_gets_the_type_of_its_partner(
+    amber_ff, residue, partner, h_type
+):
+    """A hydrogen where the rtp entry has none is HX, with the type for its partner, not its old one."""
+    atoms = _residue(amber_ff, residue)
+    nr = _nr(atoms, partner)
+    identity = amber_ff.templates.hydrogen_identity(atoms, atoms[nr], _hydroxyl_hydrogen())
+    assert identity == ("HX", h_type)
+
+
+def test_hydrogen_type_on_an_unknown_partner_type_is_none(amber_ff):
+    """A partner type the force field does not have gives no type; the hydrogen keeps its own."""
+    templates = amber_ff.templates
+    atoms = _residue(amber_ff, "ALA")
+    c = _nr(atoms, "C")
+    atoms[c].type = "XX"
+    hydrogen = _hydroxyl_hydrogen()
+    assert templates.hydrogen_type_on(atoms[c], hydrogen, atoms) is None
+    assert templates.hydrogen_identity(atoms, atoms[c], hydrogen) == ("HX", "HO")
+
+
+def test_hydrogen_moving_into_a_residue_without_rtp_entry_gets_the_type_of_its_partner(amber_ff):
+    """A hydroxyl H that moves onto the CB radical of an Ala named XYZ keeps its name and becomes HC."""
+    atoms = _residue(amber_ff, "ALA", "XYZ")
+    cb = _abstract(atoms, "HB3")
+    atoms["31"] = Atom(nr="31", type="OH", resnr="2", residue="DON", atom="O", cgnr="31",
+                       charge="-0.4000")
+    h = _add_hydrogen(atoms, "31", "HO", nr="32")
+    atoms[h].resnr, atoms[h].residue = "2", "DON"
+    top_a = _Top(atoms, amber_ff, radicals=(cb,))
+
+    top_b = _Top(deepcopy(atoms), amber_ff)
+    b = top_b.atoms
+    b["31"].bound_to_nrs.remove(h)
+    b[h].bound_to_nrs = [cb]
+    b[cb].bound_to_nrs.append(h)
+    b[h].resnr, b[h].residue = "1", "XYZ"  # as bind_bond leaves it
+    top_b.radicals = {"31": b["31"]}
+    steps = [Break(atom_id_1="31", atom_id_2=h), Bind(atom_id_1=cb, atom_id_2=h)]
+
+    renamed = assign_recipe_names(top_a, top_b, steps)
+
+    assert renamed == set()
+    assert (b[h].atom, b[h].type) == ("HO", "HC")
+    assert b[h].mass == amber_ff.atomtypes["HC"].mass

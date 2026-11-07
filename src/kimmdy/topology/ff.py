@@ -64,7 +64,8 @@ class FF:
                 "product_template_sources."
             )
         # residue templates from the ITP files and the rtp entries
-        self.templates = TemplateLibrary()
+        # (atomtypes is filled below; the library keeps the same dict)
+        self.templates = TemplateLibrary(atomtypes=self.atomtypes)
 
         ffdir: Optional[Path] = top["ffdir"]
 
