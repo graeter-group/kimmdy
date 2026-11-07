@@ -358,7 +358,9 @@ class MoleculeType:
         """Find atoms that are radicals and update self.radicals.
 
         Iterate over all atoms and designate them as radicals if they have
-        fewer bounds than their natural bond order.
+        fewer bonds than the smallest natural bond order of their atom type.
+        Atom types can have several natural bond orders
+        (see ATOMTYPE_BONDORDER_FLAT), e.g. N3 with 3 or 4 bonds.
         """
         logger.debug(
             "Trying to infer radical status based on AMBER(!!) atomtype bond "
@@ -366,20 +368,34 @@ class MoleculeType:
         )
         self.radicals = {}
         error_atoms = set()
+        unexpected_bonds = set()
         for atom in self.atoms.values():
-            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
-            if bo is None:
+            bond_orders = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            if bond_orders is None:
                 error_atoms.add(atom.type)
-            if bo and bo > len(atom.bound_to_nrs):
+                atom.is_radical = False
+                continue
+            n_bonds = len(atom.bound_to_nrs)
+            if n_bonds < min(bond_orders):
                 self.radicals[atom.nr] = atom
                 atom.is_radical = True
             else:
                 atom.is_radical = False
+                if n_bonds not in bond_orders:
+                    unexpected_bonds.add((atom.type, n_bonds))
         if len(error_atoms) > 0:
             logger.warning(
                 "Some atomtypes not found in AMBER atomtypes. Cannot infer radical status.\n"
                 "Missing atom types:\n"
                 f"{error_atoms}"
+            )
+        if len(unexpected_bonds) > 0:
+            logger.warning(
+                f"Some atoms in molecule {self.name} have a number of bonds "
+                "that does not match the bond orders of their atom type. "
+                "They are not treated as radicals.\n"
+                "(atom type, number of bonds):\n"
+                f"{sorted(unexpected_bonds)}"
             )
         return None
 
