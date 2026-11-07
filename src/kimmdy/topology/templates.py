@@ -60,6 +60,14 @@ MATCH_LEVELS = ("exact", "renamed hydrogen", "radical")
 # name of a hydrogen without a free position in its residue's template
 UNNAMED_HYDROGEN = "HX"
 
+# Amber types of aromatic carbons, and the hydrogen types by the partner's
+# element, for hydrogens that bind where no template has a hydrogen
+# (TemplateLibrary.hydrogen_type_on)
+AROMATIC_CARBON_TYPES = frozenset({"CA", "CB", "CC", "CN", "CR", "CV", "CW", "C*"})
+HYDROGEN_TYPE_BY_ELEMENT = {7: "H", 8: "HO", 16: "HS"}
+# by mass, if the force field's atomtypes have no atomic number
+ELEMENT_BY_MASS = {1: 1, 12: 6, 14: 7, 16: 8, 32: 16}
+
 # rtp entries of one amino acid in different protonation states (and CYX,
 # the disulfide cysteine). Topologies name residues by the amino acid, e.g.
 # pdb2gmx and colbuilder write HIS for HID, HIE and HIP, so every entry of
@@ -326,21 +334,32 @@ class TemplateLibrary:
 
     itp holds the ITP templates by residue name, rtp the rtp entries by
     entry name. transitions maps a precursor ITP moleculetype to its
-    product (changer.topology.product_template_transitions).
+    product (changer.topology.product_template_transitions). atomtypes
+    are the force field's (FF.atomtypes), for the types of hydrogens no
+    template places (hydrogen_type_on).
     """
 
-    def __init__(self) -> None:
+    def __init__(self, atomtypes: Optional[dict[str, AtomType]] = None) -> None:
         self.itp: dict[str, list[ResidueTemplate]] = {}
         self.rtp: dict[str, ResidueTemplate] = {}
         self.transitions: dict[str, str] = {}
+        self.atomtypes: dict[str, AtomType] = atomtypes if atomtypes is not None else {}
         # moleculetype of the kept ITP template with each signature, and
         # moleculetypes dropped as copies: the moleculetype kept instead
         self._itp_signatures: dict[tuple, str] = {}
         self._itp_copies: dict[str, str] = {}
+        # types of the hydrogens the rtp entries bond to an atom of each type
+        self._rtp_hydrogen_types: dict[str, set[str]] = {}
 
     def add_rtp(self, residuetypes: dict[str, ResidueType]) -> None:
         for name, residuetype in residuetypes.items():
-            self.rtp[name] = ResidueTemplate.from_rtp(residuetype)
+            template = ResidueTemplate.from_rtp(residuetype)
+            self.rtp[name] = template
+            for atom in template.atoms.values():
+                for h in template.hydrogens_on(atom.name):
+                    self._rtp_hydrogen_types.setdefault(atom.type, set()).add(
+                        template.atoms[h].type
+                    )
 
     def add_itp(self, template: ResidueTemplate) -> None:
         """Add an ITP template, unless one with the same atoms and bonds is there.
@@ -468,8 +487,61 @@ class TemplateLibrary:
         options = [t for t in self.rtp_variants(name) if names <= t.atoms.keys()]
         return min(options, key=lambda t: len(t.atoms), default=None)
 
+    def _element(self, atom_type: str) -> Optional[int]:
+        """Atomic number of an atom type: its at.num, else by its mass; None if unknown."""
+        atomtype = self.atomtypes.get(atom_type)
+        if atomtype is None:
+            return None
+        if atomtype.at_num.strip().isdigit():
+            return int(atomtype.at_num)
+        try:
+            return ELEMENT_BY_MASS.get(round(float(atomtype.mass)))
+        except ValueError:
+            return None
+
+    def hydrogen_type_on(
+        self, partner: Atom, hydrogen: Atom, atoms: dict[str, Atom]
+    ) -> Optional[str]:
+        """Type of a hydrogen bonded to partner where no template has a hydrogen.
+
+        1. the one hydrogen type the rtp entries bond to atoms of partner's
+           type (CA: HA, CW: H4, CR: H5, N: H, OH: HO), if there is one
+        2. else by partner's element and its other neighbors (atoms):
+           aromatic carbon (AROMATIC_CARBON_TYPES) HA, carbon bonded to N,
+           O or S H1, other carbon HC, N H, O HO, S HS
+
+        None if the type is not in the force field or partner's element is
+        unknown; the caller then keeps the hydrogen's type.
+        """
+        rtp_types = self._rtp_hydrogen_types.get(partner.type, set())
+        if len(rtp_types) == 1:
+            h_type = next(iter(rtp_types))
+        else:
+            element = self._element(partner.type)
+            if element == 6:
+                neighbors = (
+                    self._element(atoms[nr].type)
+                    for nr in partner.bound_to_nrs
+                    if nr != hydrogen.nr and nr in atoms
+                )
+                if partner.type in AROMATIC_CARBON_TYPES:
+                    h_type = "HA"
+                elif any(e in (7, 8, 16) for e in neighbors):
+                    h_type = "H1"
+                else:
+                    h_type = "HC"
+            else:
+                h_type = HYDROGEN_TYPE_BY_ELEMENT.get(element)  # type: ignore[arg-type]
+        if h_type not in self.atomtypes:
+            return None
+        return h_type
+
     def hydrogen_identity(
-        self, residue: dict[str, Atom], partner: Atom, hydrogen: Atom
+        self,
+        residue: dict[str, Atom],
+        partner: Atom,
+        hydrogen: Atom,
+        atoms: Optional[dict[str, Atom]] = None,
     ) -> Optional[tuple[str, str]]:
         """Name and type of a hydrogen that binds to partner, from the rtp entry of partner's residue.
 
@@ -477,15 +549,19 @@ class TemplateLibrary:
         (rtp_template). The hydrogen takes a free hydrogen position on
         partner, its own name if that is one, and the position's type. If
         all are taken it is named HX with the type of the first; if the
-        entry has none on partner it is named HX and keeps its type. None
-        if the residue has no rtp entry.
+        entry has none on partner it is named HX with the type from
+        hydrogen_type_on (partner's neighbors from atoms, default residue),
+        or keeps its type. None if the residue has no rtp entry.
         """
         template = self.rtp_template(residue)
         if template is None:
             return None
         positions = template.hydrogens_on(partner.atom)
         if not positions:
-            return UNNAMED_HYDROGEN, hydrogen.type
+            h_type = self.hydrogen_type_on(
+                partner, hydrogen, atoms if atoms is not None else residue
+            )
+            return UNNAMED_HYDROGEN, h_type or hydrogen.type
         taken = {atom.atom for nr, atom in residue.items() if nr != hydrogen.nr}
         free = [name for name in positions if name not in taken]
         if not free:
@@ -803,14 +879,20 @@ def _residue_identities(
                     for nr in joined
                 }
 
-    # next: 3. each hydrogen that moved in by its position on its partner
+    # next: 3. each hydrogen that moved in by its position on its partner;
+    # without an rtp entry it keeps its name and gets the type for its partner
     others = {nr: atom for nr, atom in residue.atoms.items() if nr not in joined}
     identities = {}
     for h in sorted(joined, key=int):
         partner = top_b.atoms[moved[h][1]]  # type: ignore[index]
-        identity = templates.hydrogen_identity(others, partner, top_b.atoms[h])
-        if identity is not None:
-            identities[h] = (*identity, None)
+        hydrogen = top_b.atoms[h]
+        identity = templates.hydrogen_identity(others, partner, hydrogen, top_b.atoms)
+        if identity is None:
+            h_type = templates.hydrogen_type_on(partner, hydrogen, top_b.atoms)
+            if h_type is None:
+                continue
+            identity = (hydrogen.atom, h_type)
+        identities[h] = (*identity, None)
     return "rtp positions of the hydrogens", identities
 
 
@@ -845,7 +927,9 @@ def assign_recipe_names(
        the hydrogens that moved into the residue
     3. else each hydrogen that moved in takes its position on its partner in
        the residue's rtp entry, or HX (TemplateLibrary.hydrogen_identity);
-       without an entry it keeps its name and type
+       without an entry it keeps its name. Where neither names a type, the
+       type comes from its partner (TemplateLibrary.hydrogen_type_on), or
+       it stays if that type is not in the force field
 
     The templates decide by the atoms and bonds alone, not by the charges.
     Returns the atoms whose names changed, whose improper dihedrals have to
