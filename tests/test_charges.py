@@ -2,8 +2,8 @@
 
 import logging
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Optional
 
 import numpy as np
@@ -14,6 +14,7 @@ from kimmdy.parsing import read_top
 from kimmdy.recipe import Bind, Break
 from kimmdy.topology import charges
 from kimmdy.topology.atomic import Atom
+from kimmdy.topology.templates import ResidueTemplate, assign_recipe_names
 from kimmdy.topology.topology import Topology
 
 FILEDIR = Path(__file__).parent / "test_files" / "test_topology"
@@ -65,7 +66,6 @@ class _RecipeTopology:
         self.atoms = atoms
         self.ff = ff
         self.radicals: dict[str, Atom] = {}
-        self.pending_product_template_matches: dict = {}
 
 
 def _template_residue(
@@ -159,6 +159,7 @@ def test_rtp_selects_terminal_variant(amber_ff, caplog, template, expected_type)
 
     with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
         charges.assign_recipe_charges(top_a, top_b, steps)
+    assign_recipe_names(top_a, top_b, steps)
 
     assert f"Charges of residue 1 from rtp:{template} (renamed hydrogen)" in caplog.text
     assert "Charges of residue 2 from local" in caplog.text
@@ -227,50 +228,53 @@ def test_hydrogen_without_new_partner_leaves_its_charge_on_the_old_one(amber_ff,
     assert np.isclose(float(top_b.atoms["32"].charge), 0.0)
 
 
-def _itp_match(top_b, template: str, moleculetype: str = "FAKE"):
-    """A stand-in for the exact ITP match of residue 1, with the charges of an rtp entry."""
-    residuetype = top_b.ff.residuetypes[template]
-    names = {nr: atom.atom for nr, atom in top_b.atoms.items() if atom.resnr == "1"}
-    names["32"] = "HA2"
-    mapping = {
-        nr: SimpleNamespace(
-            name=name,
-            atom_type=residuetype.atoms[name].type,
-            charge=residuetype.atoms[name].charge,
-            mass=None,
-        )
-        for nr, name in names.items()
+def _itp_template(
+    ff, template: str, moleculetype: str = "FAKE", **atom_charges: str
+) -> ResidueTemplate:
+    """A stand-in for an ITP template of the GLY residue, with the atoms of an rtp entry.
+
+    atom_charges replace the entry's charges of some atoms, by atom name.
+    """
+    rtp = ResidueTemplate.from_rtp(ff.residuetypes[template])
+    atoms = {
+        name: replace(atom, charge=atom_charges.get(name, atom.charge))
+        for name, atom in rtp.atoms.items()
     }
-    return SimpleNamespace(
-        atom_mapping=mapping, template=SimpleNamespace(moleculetype=moleculetype)
+    return replace(
+        rtp,
+        source="itp",
+        name=moleculetype,
+        residue="GLY",
+        atoms=atoms,
+        boundary_bonds=frozenset(),
     )
 
 
-def _add_itp_match(top_b, ca: str, match) -> None:
-    top_b.pending_product_template_matches[tuple(sorted((ca, "32"), key=int))] = match
+def _add_itp_template(monkeypatch, ff, template: ResidueTemplate) -> None:
+    monkeypatch.setitem(ff.templates.itp, template.residue, [template])
 
 
-def test_itp_match_precedes_rtp(amber_ff, caplog):
+def test_itp_match_precedes_rtp(amber_ff, caplog, monkeypatch):
     top_a, top_b, steps, ca = _hat_onto_gly(amber_ff, "CGLY")
-    _add_itp_match(top_b, ca, _itp_match(top_b, "CGLY"))
+    _add_itp_template(monkeypatch, amber_ff, _itp_template(amber_ff, "CGLY"))
 
     with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
         charges.assign_recipe_charges(top_a, top_b, steps)
+    assign_recipe_names(top_a, top_b, steps)
 
     assert "Charges of residue 1 from itp:FAKE" in caplog.text
     assert top_b.atoms["32"].atom == "HA2"
     _assert_template_charges(top_b, "1", "CGLY")
-    assert top_b.pending_product_template_matches == {}
 
 
-def test_itp_match_changing_the_residue_charge_hands_over_to_rtp(amber_ff, caplog):
+def test_itp_match_changing_the_residue_charge_hands_over_to_rtp(amber_ff, caplog, monkeypatch):
     top_a, top_b, steps, ca = _hat_onto_gly(amber_ff, "CGLY")
-    match = _itp_match(top_b, "CGLY")
-    match.atom_mapping[ca].charge = "-0.1493"  # CGLY CA is -0.2493
-    _add_itp_match(top_b, ca, match)
+    # CGLY CA is -0.2493
+    _add_itp_template(monkeypatch, amber_ff, _itp_template(amber_ff, "CGLY", CA="-0.1493"))
 
     with caplog.at_level(logging.DEBUG, logger="kimmdy.topology.charges"):
         charges.assign_recipe_charges(top_a, top_b, steps)
+    assign_recipe_names(top_a, top_b, steps)
 
     assert "itp:FAKE changes the charge of residue 1 by 0.1000 e" in caplog.text
     assert "Charges of residue 1 from rtp:CGLY (renamed hydrogen)" in caplog.text
@@ -279,14 +283,15 @@ def test_itp_match_changing_the_residue_charge_hands_over_to_rtp(amber_ff, caplo
 
 def test_failing_scheme_is_skipped(amber_ff, caplog, monkeypatch):
     top_a, top_b, steps, ca = _hat_onto_gly(amber_ff, "CGLY")
-    _add_itp_match(top_b, ca, _itp_match(top_b, "CGLY"))
+    _add_itp_template(monkeypatch, amber_ff, _itp_template(amber_ff, "CGLY"))
 
-    def broken_itp_scheme(residue, match):
+    def broken_itp_scheme(*args):
         raise RuntimeError("broken template")
 
     monkeypatch.setattr(charges, "_itp_scheme", broken_itp_scheme)
     with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
         charges.assign_recipe_charges(top_a, top_b, steps)
+    assign_recipe_names(top_a, top_b, steps)
 
     assert "Charge scheme itp failed for residue 1; trying the next one." in caplog.text
     assert "Charges of residue 1 from rtp:CGLY (renamed hydrogen)" in caplog.text
@@ -441,8 +446,8 @@ def test_prepare_product_parameters_parameterizes_once(imree_raw):
     top.parametrizer = recorder
     top.break_bond(("52", "53"))
 
-    report = top.prepare_product_parameters()
-    top.prepare_product_parameters()
+    report = top.update_all(None, [])
+    top.update_all(None, [])
 
     assert recorder.calls == [{"52", "53"}]
     assert report.event_focus_ids == {"52", "53"}
@@ -461,7 +466,7 @@ def test_update_charges_bonded_sets_charges_before_parameterizing(imree_hat):
             return current_topology
 
     top_b.parametrizer = RecordingParameterizer()
-    report = top_b.update_charges_bonded(top_a, steps, conservation_check="error")
+    report = top_b.update_all(top_a, steps, conservation_check="error")
 
     glu = top_b.ff.residuetypes["GLU"]
     assert len(seen_h_charges) == 1
@@ -480,10 +485,11 @@ def test_update_charges_bonded_without_topology_change_only_prepares_parameters(
 
     monkeypatch.setattr("kimmdy.topology.topology.assign_recipe_charges", fail)
     monkeypatch.setattr("kimmdy.topology.topology.check_charge_conservation", fail)
+    monkeypatch.setattr("kimmdy.topology.topology.assign_recipe_names", fail)
     top = Topology(deepcopy(imree_raw))
     top.parameterization_focus_ids = {"1"}  # e.g. from a Place
 
-    report = top.update_charges_bonded(None, [])
+    report = top.update_all(None, [])
 
     assert report.event_focus_ids == {"1"}
     assert top.parameterization_focus_ids == set(top.radicals)
@@ -559,6 +565,7 @@ def test_hat_between_residues_with_the_same_number_uses_both_templates(amber_ff,
 
     with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
         charges.assign_recipe_charges(top_a, top_b, steps)
+    assign_recipe_names(top_a, top_b, steps)
 
     assert "Charges of residue 5 from rtp:TYR (radical)" in caplog.text
     assert "Charges of residue 5 from rtp:TYR (renamed hydrogen)" in caplog.text
@@ -690,6 +697,7 @@ def test_hat_onto_his_uses_the_hie_entry(amber_ff, caplog):
 
     with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
         charges.assign_recipe_charges(top_a, top_b, steps)
+    assign_recipe_names(top_a, top_b, steps)
 
     assert "Charges of residue 1 from rtp:HIE (renamed hydrogen)" in caplog.text
     hie = amber_ff.residuetypes["HIE"].atoms

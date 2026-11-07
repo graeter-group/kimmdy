@@ -11,6 +11,7 @@ from kimmdy.parsing import TopologyDict, read_top
 from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
 from kimmdy.topology.charges import assign_recipe_charges
+from kimmdy.topology.templates import assign_recipe_names
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.utils import (
     get_protein_section,
@@ -793,6 +794,7 @@ class TestHexalaTopology:
         """HAT of H at 34 to C at 29"""
         top = deepcopy(hexala_top_fix)
         top_ref = deepcopy(top_hat_34_to_29_fix)
+        top_a = deepcopy(top)
         top.break_bond(("29", "35"))
         top.break_bond(("31", "34"))
         top.bind_bond(("34", "29"))
@@ -803,6 +805,16 @@ class TestHexalaTopology:
         assert len(top.angles) == len(top_ref.angles)
         assert len(top.proper_dihedrals) == len(top_ref.proper_dihedrals)
         # assert len(top.improper_dihedrals) == len(top_ref.improper_dihedrals)
+
+        # names and types come from the residue templates after the steps
+        top.update_names_LJ(
+            top_a,
+            [
+                Break(atom_id_1="29", atom_id_2="35"),
+                Break(atom_id_1="31", atom_id_2="34"),
+                Bind(atom_id_1="34", atom_id_2="29"),
+            ],
+        )
 
         # inspect HAT hydrogen
         h = top.atoms["34"]
@@ -1281,10 +1293,8 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
     top.break_bond((donor.nr, donor_h.nr))
     top.bind_bond((acceptor.nr, donor_h.nr))
 
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    assert match_key in top.pending_product_template_matches
-
     assign_recipe_charges(top_a, top, recipe_steps)
+    assign_recipe_names(top_a, top, recipe_steps)
 
     assert tuple(sorted((donor.nr, donor_h.nr), key=int)) not in top.bonds
     assert tuple(sorted((acceptor.nr, donor_h.nr), key=int)) in top.bonds
@@ -1295,8 +1305,8 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
 
     closed_template = next(
         template
-        for template in top.ff.product_templates.templates["PLPC"]
-        if template.moleculetype == "PLPC"
+        for template in top.ff.templates.itp["PLPC"]
+        if template.name == "PLPC"
     )
     product_atoms = [
         atom for atom in top.atoms.values() if atom.resnr == acceptor_resnr
@@ -1304,19 +1314,18 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
     assert {atom.atom for atom in product_atoms} == set(closed_template.atoms)
     for atom in product_atoms:
         expected = closed_template.atoms[atom.atom]
-        assert atom.type == expected.atom_type
+        assert atom.type == expected.type
         assert np.isclose(float(atom.charge), float(expected.charge))
         assert atom.mass == (
             expected.mass
             if expected.mass is not None
-            else top.ff.atomtypes[expected.atom_type].mass
+            else top.ff.atomtypes[expected.type].mass
         )
 
     assert np.isclose(
         sum(float(atom.charge) for atom in top.atoms.values()),
         initial_total_charge,
     )
-    assert match_key not in top.pending_product_template_matches
     assert {donor.nr, donor_h.nr, acceptor.nr} <= top.parameterization_focus_ids
 
 
@@ -1351,8 +1360,6 @@ def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
     top.bind_bond((acceptor.nr, donor_h.nr))
     assign_recipe_charges(top_a, top, [break_step, bind_step])
 
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    assert match_key not in top.pending_product_template_matches
     assert donor_h.atom == original_h_name
     assert donor_h.type == original_h_type
     assert np.isclose(float(donor.charge), expected_donor_charge)
@@ -1394,13 +1401,21 @@ def test_itp_template_precedes_rtp_fallback():
         product_template_itp_glob="*.itp",
     )
     donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
+    top_a = deepcopy(top)
 
     top.break_bond((donor.nr, donor_h.nr))
     top.bind_bond((acceptor.nr, donor_h.nr))
 
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    match = top.pending_product_template_matches[match_key]
-    assert match.template.moleculetype == "PLPC"
+    residue = get_residue_by_bonding(acceptor, top.atoms)
+    match = top.ff.templates.match_itp(residue, {donor_h.nr}, top.atoms, top_a.atoms)
+    assert match.template.name == "PLPC"
+    # charges and names after the recipe segment
+    recipe_steps = [
+        Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr),
+        Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr),
+    ]
+    assign_recipe_charges(top_a, top, recipe_steps)
+    assign_recipe_names(top_a, top, recipe_steps)
     assert donor_h.atom == "H3X"
 
 
@@ -1429,9 +1444,8 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
     top_a = deepcopy(top)
     top.break_bond((donor.nr, donor_h.nr))
     top.bind_bond((acceptor.nr, donor_h.nr))
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    assert match_key in top.pending_product_template_matches
     assign_recipe_charges(top_a, top, [break_step, bind_step])
+    assign_recipe_names(top_a, top, [break_step, bind_step])
 
     product_atoms = {
         atom.atom: atom
@@ -1455,7 +1469,6 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
         sum(float(atom.charge) for atom in top.atoms.values()),
         initial_total_charge,
     )
-    assert match_key not in top.pending_product_template_matches
 
 
 def _alacar_with_extra_lines(section: str, extra: list[list[str]]) -> dict:

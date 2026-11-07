@@ -1144,7 +1144,7 @@ class RunManager:
         if self.config.parameterize_at_setup:
             self.top.parameterization_focus_ids = set(self.top.atoms.keys())
             self.top.needs_parameterization = True
-            self.top.update_parameters()
+            self.top.update_bonded()
             self.top.parameterization_focus_ids = set(self.top.radicals)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
@@ -1568,8 +1568,9 @@ class RunManager:
 
         # Applying the recipes starts here
         # A Relax ends a segment of the recipe: the topology after the steps
-        # so far (B) gets its charges and bonded parameters, and the
-        # relaxation goes from the topology before them (A) to B.
+        # so far (B) gets its names, types, charges and bonded parameters
+        # (Topology.update_all), and the relaxation goes from the topology
+        # before them (A) to B.
         # The steps after it start from B.
         charge_options = self.config.changer.apply_recipe.charges
         charge_kwargs = dict(
@@ -1612,7 +1613,7 @@ class RunManager:
                     self.top.parameterization_focus_ids.update([step.id_to_place])
             elif isinstance(step, Relax):
                 # B is finished before the relaxation goes to it
-                parameterization = self.top.update_charges_bonded(
+                parameterization = self.top.update_all(
                     top_a, segment_steps, **charge_kwargs
                 )
                 if not hasattr(self.config.changer.coordinates, "md"):
@@ -1680,7 +1681,7 @@ class RunManager:
 
         if not recipe.recipe_steps or not isinstance(recipe.recipe_steps[-1], Relax):
             # steps after the last Relax, or a recipe without one
-            self.top.update_charges_bonded(top_a, segment_steps, **charge_kwargs)
+            self.top.update_all(top_a, segment_steps, **charge_kwargs)
 
         # this is the new topology after the reaction
         # not the temporary topology <name>_relax.top for the relaxation
