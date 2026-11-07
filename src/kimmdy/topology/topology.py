@@ -3,7 +3,7 @@ import textwrap
 from copy import copy, deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Collection, Optional, Union
 
 from kimmdy.constants import (
     ATOM_ID_FIELDS,
@@ -41,7 +41,7 @@ from kimmdy.topology.charges import (
     check_charge_conservation,
 )
 from kimmdy.topology.ff import FF
-from kimmdy.topology.product_templates import ProductTemplateMatch
+from kimmdy.topology.templates import assign_recipe_names, is_hydrogen
 from kimmdy.topology.utils import (
     attributes_to_list,
     get_moleculetype_atomics,
@@ -88,6 +88,7 @@ class MoleculeType:
         atomics: dict,
         radicals: Optional[str] = None,
         repeated_lines: str = "merge",
+        ff: Optional[FF] = None,
     ) -> None:
         # what to do with repeated topology lines: merge, error or last
         # (changer.topology.repeated_topology_lines)
@@ -139,7 +140,7 @@ class MoleculeType:
                             "config file not in topology. Ignoring this entry."
                         )
         else:
-            self.find_radicals()
+            self.find_radicals(ff)
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -354,13 +355,17 @@ class MoleculeType:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def find_radicals(self):
+    def find_radicals(self, ff: Optional[FF] = None):
         """Find atoms that are radicals and update self.radicals.
 
         Iterate over all atoms and designate them as radicals if they have
         fewer bonds than the smallest natural bond order of their atom type.
         Atom types can have several natural bond orders
-        (see ATOMTYPE_BONDORDER_FLAT), e.g. N3 with 3 or 4 bonds.
+        (see ATOMTYPE_BONDORDER_FLAT), e.g. N3 with 3 or 4 bonds. An atom
+        with fewer bonds than the largest, e.g. an N3 with 3 bonds (a neutral
+        amine or an NH3+ that lost a hydrogen), is a radical if the rtp entry
+        of its residue makes it one (TemplateLibrary.radical_by_template),
+        given ff. Without ff, or without an entry that fits, it is not.
         """
         logger.debug(
             "Trying to infer radical status based on AMBER(!!) atomtype bond "
@@ -369,6 +374,8 @@ class MoleculeType:
         self.radicals = {}
         error_atoms = set()
         unexpected_bonds = set()
+        # atoms whose number of bonds fits several states, decided by templates
+        ambiguous = []
         for atom in self.atoms.values():
             bond_orders = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bond_orders is None:
@@ -383,6 +390,13 @@ class MoleculeType:
                 atom.is_radical = False
                 if n_bonds not in bond_orders:
                     unexpected_bonds.add((atom.type, n_bonds))
+                elif 0 not in bond_orders and n_bonds < max(bond_orders):
+                    ambiguous.append(atom)
+        if ff is not None:
+            for atom in ambiguous:
+                if ff.templates.radical_by_template(self.atoms, atom):
+                    self.radicals[atom.nr] = atom
+                    atom.is_radical = True
         if len(error_atoms) > 0:
             logger.warning(
                 "Some atomtypes not found in AMBER atomtypes. Cannot infer radical status.\n"
@@ -539,7 +553,8 @@ class MoleculeType:
     ) -> dict[ImproperDihedralId, list[ResidueImproperSpec]]:
         """Find the residue-template impropers that contain one atom, with real atom numbers.
 
-        Looks up the atom's residue template, translates the template's atom
+        Looks up the atom's residue template (by residue name, else by atom
+        names, e.g. HIE for a HIS), translates the template's atom
         names (including -C, the previous residue's C, and +N, the next
         residue's N) into atom numbers, and returns every improper term that
         contains the atom: {four atom numbers: list of terms, one per
@@ -547,25 +562,30 @@ class MoleculeType:
         <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         """
 
+        def residuetype_of(residue: dict[str, Atom]) -> Optional[ResidueType]:
+            """The rtp entry of a residue, by its name and atom names (TemplateLibrary.rtp_template)."""
+            template = ff.templates.rtp_template(residue)
+            return None if template is None else ff.residuetypes.get(template.name)
+
         atom = self.atoms[atom_nr]
-        residuetype = ff.residuetypes.get(atom.residue)
-        if not isinstance(residuetype, ResidueType):
+        residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
+        residuetype = residuetype_of(residue)
+        if residuetype is None:
             return {}
 
         # find the previous and next residue (needed for -C and +N)
-        residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
         previous_atom, next_atom = self._get_neighbor_residue_atoms(residue)
         if previous_atom is not None:
             previous_residue = get_residue_by_bonding(
                 atom=previous_atom, atoms=self.atoms
             )
-            previous_residuetype = ff.residuetypes.get(previous_atom.residue)
+            previous_residuetype = residuetype_of(previous_residue)
         else:
             previous_residue = {}
             previous_residuetype = None
         if next_atom is not None:
             next_residue = get_residue_by_bonding(atom=next_atom, atoms=self.atoms)
-            next_residuetype = ff.residuetypes.get(next_atom.residue)
+            next_residuetype = residuetype_of(next_residue)
         else:
             next_residue = {}
             next_residuetype = None
@@ -644,6 +664,37 @@ class MoleculeType:
                 new_dihedrals[key] = list(impropers)
 
         return new_dihedrals
+
+    def update_impropers(self, atom_nrs: Collection[str], ff: FF) -> None:
+        """Set the improper dihedrals of these atoms again from their residue templates.
+
+        Removes every improper dihedral that contains one of the atoms and
+        adds the template impropers that contain one of them, every listed
+        term (one per periodicity), by the current atom names.
+        """
+        atom_nrs = set(atom_nrs)
+        if not atom_nrs:
+            return
+        for key in [key for key in self.improper_dihedrals if atom_nrs & set(key)]:
+            self.improper_dihedrals.pop(key)
+
+        impropers: dict[ImproperDihedralId, list[ResidueImproperSpec]] = {}
+        for atom_nr in sorted(atom_nrs, key=int):
+            impropers.update(self._get_atom_improper_dihedrals(atom_nr, ff))
+        for key, specs in impropers.items():
+            if self.improper_dihedrals.get(key) is None:
+                self.improper_dihedrals[key] = MultipleDihedrals(
+                    *key, FFFUNC["mult_improper_dihedral"], dihedrals={}
+                )
+            for value in specs:
+                periodicity = "" if value.c2 is None else value.c2
+                self.improper_dihedrals[key].dihedrals[periodicity] = Dihedral(
+                    *key,
+                    FFFUNC["mult_improper_dihedral"],
+                    c0=value.c0,
+                    c1=value.c1,
+                    periodicity=periodicity,
+                )
 
     def _get_neighbor_residue_atoms(
         self, residue: dict[str, Atom]
@@ -994,9 +1045,6 @@ class Topology:
             product_template_transitions=product_template_transitions,
             repeated_topology_lines=repeated_topology_lines,
         )
-        self.pending_product_template_matches: dict[
-            tuple[str, str], ProductTemplateMatch
-        ] = {}
         # #define names first, so periodicities are known whatever the mode
         self._expand_parameter_macros()
         self._parse_molecules()
@@ -1124,6 +1172,7 @@ class Topology:
             reactive_atomics,
             radicals,
             repeated_lines=self.repeated_topology_lines,
+            ff=self.ff,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -1327,30 +1376,82 @@ class Topology:
         )
         self.parametrizer.parameterize_topology(self, focus_nrs=focus_ids)
 
-    def update_parameters(self):
-        if self.needs_parameterization:
-            self._parameterize_focus(set(self.parameterization_focus_ids))
-            self.needs_parameterization = False
+    def update_bonded(self) -> ParameterizationReport:
+        """Parameterize the bonded interactions around the focus atoms, if the topology changed.
 
-    def prepare_product_parameters(self) -> ParameterizationReport:
-        """Parameterize the product (topology B) once, then keep only active radicals in focus.
-
-        Partial charges must be final before this call, because the
-        parameterizer may use them.
+        Returns the atoms in focus and the radicals. Charges and atom types
+        must be final before, because the parameterizer may use them
+        (update_nonbonded).
         """
-        event_focus_ids = set(self.parameterization_focus_ids)
+        focus_ids = set(self.parameterization_focus_ids)
         if self.needs_parameterization:
-            self._parameterize_focus(event_focus_ids)
-
-        active_radical_ids = set(self.radicals)
-        self.parameterization_focus_ids = active_radical_ids
-        self.needs_parameterization = False
+            self._parameterize_focus(focus_ids)
+            self.needs_parameterization = False
         return ParameterizationReport(
-            event_focus_ids=event_focus_ids,
-            active_radical_ids=active_radical_ids,
+            event_focus_ids=focus_ids,
+            active_radical_ids=set(self.radicals),
         )
 
-    def update_charges_bonded(
+    def update_parameters(self) -> ParameterizationReport:
+        """Deprecated name of update_bonded."""
+        return self.update_bonded()
+
+    def update_names_LJ(self, top_a: "Topology", recipe_steps: list[RecipeStep]) -> None:
+        """Set names, atom types (Lennard-Jones) and masses of the residues recipe steps touched.
+
+        This topology is the one after the steps (B), top_a the one before
+        them (A). The residue templates decide (assign_recipe_names); atoms
+        that get another name get their improper dihedrals again.
+        """
+        logger.info("Updating atom names and types")
+        renamed = assign_recipe_names(top_a, self, recipe_steps)
+        self.reactive_molecule.update_impropers(renamed, self.ff)
+
+    def update_charges(
+        self,
+        top_a: "Topology",
+        recipe_steps: list[RecipeStep],
+        template_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_check: str = "warn",
+    ) -> None:
+        """Set the charges of the residues recipe steps touched and check the net charge.
+
+        This topology is the one after the steps (B), top_a the one before
+        them (A). See assign_recipe_charges and check_charge_conservation.
+        """
+        logger.info("Updating partial charges")
+        assign_recipe_charges(top_a, self, recipe_steps, tolerance=template_tolerance)
+        check_charge_conservation(
+            top_a,
+            self,
+            tolerance=conservation_tolerance,
+            action=conservation_check,
+        )
+
+    def update_nonbonded(
+        self,
+        top_a: "Topology",
+        recipe_steps: list[RecipeStep],
+        template_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_check: str = "warn",
+    ) -> None:
+        """Set names, atom types, masses and charges after recipe steps.
+
+        Names and types come first, so the charges match the residue
+        templates by the final names.
+        """
+        self.update_names_LJ(top_a, recipe_steps)
+        self.update_charges(
+            top_a,
+            recipe_steps,
+            template_tolerance=template_tolerance,
+            conservation_tolerance=conservation_tolerance,
+            conservation_check=conservation_check,
+        )
+
+    def update_all(
         self,
         top_a: Optional["Topology"],
         recipe_steps: list[RecipeStep],
@@ -1358,29 +1459,30 @@ class Topology:
         conservation_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
         conservation_check: str = "warn",
     ) -> ParameterizationReport:
-        """Update the charges, then the bonded parameters, after recipe steps.
+        """Update the topology after recipe steps: nonbonded, then bonded.
 
         This topology is the one after the steps (B), top_a the one before
         them (A), which stays unchanged. If top_a is None the steps did not
-        change the topology, and only the parameters are prepared. The
-        parameterizer may use the charges, so they are final before it runs.
+        change the topology, and only the bonded parameters are updated. The
+        parameterizer may use charges and types, so they are final before it
+        runs. Afterwards only the radicals stay in the parameterization focus,
+        for the next event. Returns what update_bonded returns.
         """
         if top_a is not None:
-            logger.info("Updating partial charges")
-            assign_recipe_charges(
-                top_a, self, recipe_steps, tolerance=template_tolerance
-            )
-            check_charge_conservation(
+            self.update_nonbonded(
                 top_a,
-                self,
-                tolerance=conservation_tolerance,
-                action=conservation_check,
+                recipe_steps,
+                template_tolerance=template_tolerance,
+                conservation_tolerance=conservation_tolerance,
+                conservation_check=conservation_check,
             )
-        logger.info("Updating parameters")
-        return self.prepare_product_parameters()
+        logger.info("Updating bonded parameters")
+        report = self.update_bonded()
+        self.parameterization_focus_ids = set(self.radicals)
+        return report
 
     def to_dict(self) -> TopologyDict:
-        self.update_parameters()
+        self.update_bonded()
         self._update_dict()
         return self.top
 
@@ -1441,7 +1543,7 @@ class Topology:
         update_map = update_map_all[REACTIVE_MOLECULEYPE]
 
         if parameterize:
-            self.update_parameters()
+            self.update_bonded()
             # Overwriting in case of no parameterization wanted
             self.needs_parameterization = False
             self.parameterization_focus_ids = set()
@@ -1643,111 +1745,13 @@ class Topology:
                         "not registed in moleculetype.radicals"
                     )
 
-        # TODO: Do we still need this with grappa?
-        # quickfix for jumping hydrogens
-        # to make them adopt the correct residuetype and atomtype
-        # when bound to a new heavy atom
+        # a hydrogen joins the residue of its new partner; update_names_LJ
+        # gives it its name and type from the residue templates
         for i, atom in enumerate(atompair):
-            if atom.type.upper().startswith("H"):
-                other_i = abs(i - 1)
-                other_atom = atompair[other_i]
-                other_res = other_atom.residue
-                atom.residue = other_res
-                atom.resnr = other_atom.resnr
-
-                template_match = None
-                if "itp" in self.ff.product_template_sources:
-                    template_match = (
-                        self.ff.product_templates.match_hydrogenated_residue(
-                            topology=self,
-                            acceptor=other_atom,
-                            transferred_h=atom,
-                        )
-                    )
-                if template_match is not None:
-                    template_h = template_match.template.atoms[
-                        template_match.transferred_h_template_name
-                    ]
-                    atom.atom = template_h.name
-                    atom.type = template_h.atom_type
-                    atom.mass = (
-                        template_h.mass
-                        if template_h.mass is not None
-                        else self.ff.atomtypes[template_h.atom_type].mass
-                    )
-                    self.pending_product_template_matches[
-                        atompair_nrs
-                    ] = template_match
-                    logger.info(
-                        "Matched hydrogenated product to ITP template "
-                        "%s:%s (%s); assigned transferred H as %s with type %s.",
-                        template_match.template.moleculetype,
-                        template_match.template.local_resnr,
-                        template_match.template.residue,
-                        template_h.name,
-                        template_h.atom_type,
-                    )
-                    continue
-
-                if "rtp" not in self.ff.product_template_sources:
-                    logger.warning(
-                        "No exact ITP product template matched hydrogen binding "
-                        "to %s:%s (atom %s). Keeping the legacy atom identity "
-                        "and using Grappa bonded-parameter fallback.",
-                        other_atom.residue,
-                        other_atom.atom,
-                        other_atom.nr,
-                    )
-                    continue
-
-                # TODO: Extend exact RTP product matching to restore resolved
-                # bonded interactions, including cross-residue boundary terms.
-                aa = self.ff.residuetypes.get(other_res)
-                if not aa:
-                    logging.warning(
-                        f"No residuetype found in ff for {other_res}, to which a H would bind"
-                    )
-                    continue
-
-                other_residue = get_residue_by_bonding(
-                    other_atom, reactive_moleculetype.atoms
-                )
-                residue_atomnames_current = [a.atom for a in other_residue.values()]
-                name_set = False
-                for key, bond in aa.bonds.items():
-                    if other_atom.atom in key and any(
-                        k.upper().startswith("H") for k in key
-                    ):
-                        if key[0] == other_atom.atom:
-                            h_name = bond.atom2
-                        else:
-                            h_name = bond.atom1
-
-                        atom.type = aa.atoms[h_name].type
-                        if (
-                            not h_name in residue_atomnames_current
-                            or h_name == atom.atom
-                        ):
-                            atom.atom = h_name
-                            name_set = True
-                        else:
-                            atom.atom = "HX"
-                            name_set = True
-                            continue
-                        logger.debug(f"Hydrogen will be bound to {other_atom}.")
-                        break
-                else:
-                    if name_set:
-                        logger.warning(
-                            "Found new atomtype but not atomname for HAT hydrogen!"
-                        )
-                    else:
-                        logger.warning(
-                            "Found neither new atomtype nor atomname for HAT hydrogen!"
-                        )
-                if not name_set:
-                    atom.atom = "HX"
-                    logger.debug(f"Named newly bonded hydrogen 'HX'")
+            if is_hydrogen(atom.type):
+                partner = atompair[1 - i]
+                atom.residue = partner.residue
+                atom.resnr = partner.resnr
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
@@ -1765,16 +1769,6 @@ class Topology:
             str(x) for x in sorted([atompair[0].nr, atompair[1].nr], key=int)
         )  # type: ignore
         reactive_moleculetype.pairs.pop(bond_pairkey, None)
-
-        # and remove improper dihedrals connected to the bonds,
-        # as they will be re-added based on potentially changed residuetypes
-        to_pop = []
-        for key in reactive_moleculetype.improper_dihedrals.keys():
-            if atompair_nrs[0] in key or atompair_nrs[1] in key:
-                to_pop.append(key)
-
-        for key in to_pop:
-            reactive_moleculetype.improper_dihedrals.pop(key, None)
 
         # add angles
         angle_keys = reactive_moleculetype._get_atom_angles(
@@ -1819,30 +1813,8 @@ class Topology:
                         pairkey[0], pairkey[1], FFFUNC["pair"]
                     )
 
-        # improper dihedral: re-add the template impropers of both atoms,
-        # every listed term (one per periodicity)
-        atom_impropers = reactive_moleculetype._get_atom_improper_dihedrals(
-            atompair_nrs[0], self.ff
-        )
-        atom_impropers.update(
-            reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
-        )
-        for key, specs in atom_impropers.items():
-            if reactive_moleculetype.improper_dihedrals.get(key) is None:
-                reactive_moleculetype.improper_dihedrals[key] = MultipleDihedrals(
-                    *key, FFFUNC["mult_improper_dihedral"], dihedrals={}
-                )
-            for value in specs:
-                periodicity = "" if value.c2 is None else value.c2
-                reactive_moleculetype.improper_dihedrals[key].dihedrals[periodicity] = (
-                    Dihedral(
-                        *key,
-                        FFFUNC["mult_improper_dihedral"],
-                        c0=value.c0,
-                        c1=value.c1,
-                        periodicity=periodicity,
-                    )
-                )
+        # improper dihedrals of both atoms from their residue templates
+        reactive_moleculetype.update_impropers(atompair_nrs, self.ff)
 
         # remove settles and explicit exclusions
         # those are used by solvent molecules

@@ -7,7 +7,7 @@ from math import sqrt
 import pytest
 from pathlib import Path
 import MDAnalysis as mda
-from kimmdy.recipe import Place
+from kimmdy.recipe import Bind, Break, Place
 from kimmdy.parsing import read_top, write_top
 from kimmdy.constants import REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
@@ -357,13 +357,26 @@ def test_merge_uses_b_charges_in_both_states(arranged_tmp_path):
     assert top_a.atoms["27"].typeB == "H1"  # the moved hydrogen still changes type
 
 
+def _hat(top: Topology, donor: str, hydrogen: str, acceptor: str) -> None:
+    """Move a hydrogen from donor to acceptor as a recipe segment does: bonds, then names and types."""
+    top_before = copy.deepcopy(top)
+    top.break_bond((donor, hydrogen))
+    top.bind_bond((hydrogen, acceptor))
+    top.update_names_LJ(
+        top_before,
+        [
+            Break(atom_id_1=donor, atom_id_2=hydrogen),
+            Bind(atom_id_1=hydrogen, atom_id_2=acceptor),
+        ],
+    )
+
+
 def test_merge_small_hat_details(arranged_tmp_path, caplog):
     top = Topology(read_top(Path("AlaCaR_out.top")))
     top_a = copy.deepcopy(top)
     top_b = top
 
-    top_b.break_bond(("7", "8"))
-    top_b.bind_bond(("8", "9"))
+    _hat(top_b, "7", "8", "9")
     merger = MoleculeTypeMerger(
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         top_b.moleculetypes[REACTIVE_MOLECULEYPE],
@@ -485,8 +498,7 @@ def test_union_exclusion_reconciliation_keeps_connected_hat_behavior(
     top_a = copy.deepcopy(top)
     top_b = copy.deepcopy(top)
 
-    top_b.break_bond(("7", "8"))
-    top_b.bind_bond(("8", "9"))
+    _hat(top_b, "7", "8", "9")
 
     merger = MoleculeTypeMerger(
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
@@ -501,15 +513,13 @@ def test_union_exclusion_reconciliation_keeps_connected_hat_behavior(
 def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
     top = Topology(read_top(Path("AlaCaR_out.top")))
     # move the radical to N16 before we start
-    top.break_bond(("16", "17"))
-    top.bind_bond(("9", "17"))
+    _hat(top, "16", "17", "9")
 
     top_a = copy.deepcopy(top)
     top_b = top
 
     # now the hat to investigate
-    top_b.break_bond(("18", "21"))
-    top_b.bind_bond(("16", "21"))
+    _hat(top_b, "18", "21", "16")
 
     merger = MoleculeTypeMerger(
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
@@ -557,8 +567,7 @@ def test_merge_small_hat_harmonic_acceptor_h_term(arranged_tmp_path):
         """Move the H from atom 7 to atom 9, build the relax topology with or without the spring, and return it as text sections."""
         top = Topology(read_top(Path("AlaCaR_out.top")))
         top_a = copy.deepcopy(top)
-        top.break_bond(("7", "8"))
-        top.bind_bond(("8", "9"))
+        _hat(top, "7", "8", "9")
         merge_top_slow_growth(top_a, top, harmonic_acceptor_h_relax_term=helper)
         return top_a.to_dict()
 
@@ -589,8 +598,7 @@ def _hat_states(case: str) -> tuple[Topology, Topology]:
     if case == "small":
         top_b = Topology(read_top(Path("AlaCaR_out.top")))
         top_a = copy.deepcopy(top_b)
-        top_b.break_bond(("7", "8"))
-        top_b.bind_bond(("8", "9"))
+        _hat(top_b, "7", "8", "9")
         return top_a, top_b
     return Topology(read_top(Path("topol_stateA.top"))), Topology(read_top(Path("topol_stateB.top")))
 
