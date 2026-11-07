@@ -102,30 +102,76 @@ def _fragments(atoms: dict[str, Atom]) -> list[set[str]]:
     return fragments
 
 
-def _residues_by_number(top: Topology, atom_nrs: set[str]) -> dict[str, dict[str, Atom]]:
-    """Atoms bonded to these atoms within their residue number, grouped by residue number."""
-    residues: dict[str, dict[str, Atom]] = {}
+def _residue_walks(top: Topology, atom_nrs: set[str]) -> list[dict[str, Atom]]:
+    """The residues containing these atoms, found along the bonds, each once."""
+    walks: list[dict[str, Atom]] = []
     for nr in sorted(atom_nrs, key=int):
         atom = top.atoms.get(nr)
-        if atom is not None:
-            residues.setdefault(atom.resnr, {}).update(
-                get_residue_by_bonding(atom, top.atoms)
-            )
-    return residues
+        if atom is not None and not any(nr in walk for walk in walks):
+            walks.append(get_residue_by_bonding(atom, top.atoms))
+    return walks
 
 
 def touched_residues(top_a: Topology, top_b: Topology, atom_nrs: set[str]) -> list[_Residue]:
-    """The residues containing these atoms, with their atoms in B and their charge in A."""
-    residues_a = _residues_by_number(top_a, atom_nrs)
-    return [
-        _Residue(
-            resnr=resnr,
-            atoms=atoms,
-            fragments=_fragments(atoms),
-            charge_a=sum(float(atom.charge) for atom in residues_a.get(resnr, {}).values()),
+    """The residues containing these atoms, with their atoms in B and their charge in A.
+
+    Residues are found along the bonds, in A and in B. Residue numbers are
+    not unique in a merged topology, so they do not group atoms. A residue
+    of A and one of B are the same residue if the atoms of one are a subset
+    of the other's and at least one of their atoms keeps its residue number:
+    a residue split by a broken bond is one residue in A and several in B, a
+    residue that lost or gained a hydrogen keeps all its other atoms, and
+    pieces joined by a new bond are several residues in A and one in B.
+    Atoms that only moved into a residue, such as those of a water without
+    bonds (settles) in a hydrolysis, are residues of their own in A; their
+    charge in A does not count for the residue they join. Matches are
+    joined transitively.
+    """
+    walks_a = _residue_walks(top_a, atom_nrs)
+    walks_b = _residue_walks(top_b, atom_nrs)
+
+    # union-find over the walks, those of A first, then those of B
+    parent = list(range(len(walks_a) + len(walks_b)))
+
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i, walk_a in enumerate(walks_a):
+        for j, walk_b in enumerate(walks_b):
+            nested = walk_a.keys() <= walk_b.keys() or walk_b.keys() <= walk_a.keys()
+            # an atom that keeps its residue number links them; atoms that only
+            # moved into the residue (the O of a water without bonds) do not
+            stays = any(
+                nr in walk_b and walk_b[nr].resnr == atom.resnr for nr, atom in walk_a.items()
+            )
+            if nested and stays:
+                parent[find(len(walks_a) + j)] = find(i)
+
+    groups: dict[int, tuple[list[dict[str, Atom]], list[dict[str, Atom]]]] = {}
+    for i, walk in enumerate(walks_a + walks_b):
+        groups.setdefault(find(i), ([], []))[i >= len(walks_a)].append(walk)
+
+    residues = []
+    for group_a, group_b in groups.values():
+        if not group_b:
+            continue  # none of its atoms are in B
+        atoms = {nr: atom for walk in group_b for nr, atom in walk.items()}
+        resnr = atoms[min(atoms, key=int)].resnr
+        if group_a:
+            charge_a = sum(float(atom.charge) for walk in group_a for atom in walk.values())
+        else:
+            logger.warning(
+                f"No residue of the topology before the recipe matches residue {resnr} "
+                "after it; its charge before is taken from the same atoms."
+            )
+            charge_a = sum(float(top_a.atoms[nr].charge) for nr in atoms if nr in top_a.atoms)
+        residues.append(
+            _Residue(resnr=resnr, atoms=atoms, fragments=_fragments(atoms), charge_a=charge_a)
         )
-        for resnr, atoms in _residues_by_number(top_b, atom_nrs).items()
-    ]
+    return residues
 
 
 def moved_hydrogens(
@@ -191,17 +237,49 @@ def local_charges(
     return charges
 
 
-def residue_variants(residue: str) -> list[str]:
-    """Residue names that may describe a residue: itself and its terminal variants.
+# rtp entries of one amino acid in different protonation states (and CYX,
+# the disulfide cysteine). Topologies name residues by the amino acid, e.g.
+# pdb2gmx and colbuilder write HIS for HID, HIE and HIP, so every entry of
+# the group may describe the residue; the atom names and radicals decide.
+PROTONATION_STATES = (
+    ("HIS", "HID", "HIE", "HIP"),
+    ("LYS", "LYN"),
+    ("ASP", "ASH"),
+    ("GLU", "GLH"),
+    ("CYS", "CYX", "CYM"),
+)
 
-    Assumes the Amber naming N<name> and C<name> for the N- and C-terminal
-    variants. This could be improved by reading the force field's .r2b files.
+
+def residue_variants(residue: str) -> list[str]:
+    """Residue names that may describe a residue and their terminal variants.
+
+    These are the residue itself and the other protonation states of its
+    amino acid (PROTONATION_STATES). Assumes the Amber naming N<name> and
+    C<name> for the N- and C-terminal variants. This could be improved by
+    reading the force field's .r2b files.
     """
-    return list(dict.fromkeys([residue, f"N{residue}", f"C{residue}"]))
+    group = next((g for g in PROTONATION_STATES if residue in g), ())
+    names = [residue, *(name for name in group if name != residue)]
+    return list(dict.fromkeys(v for name in names for v in (name, f"N{name}", f"C{name}")))
 
 
 def _bonded_in_template(residuetype: ResidueType, name: str) -> set[str]:
     return {other for bond in residuetype.bonds if name in bond for other in bond} - {name}
+
+
+def _bonded_to_neighbor_in_template(residuetype: ResidueType, name: str) -> bool:
+    """Whether the entry bonds this atom to the previous or next residue.
+
+    The rtp names atoms of the neighbors -C, +N etc. A residue's own atom X
+    bonds to a neighbor if X has such a partner, or if the entry lists -X or
+    +X (the same atom of the neighbor, e.g. C in -C N).
+    """
+    names = {n for bond in residuetype.bonds for n in bond}
+    return (
+        any(other[0] in "-+" for other in _bonded_in_template(residuetype, name))
+        or f"-{name}" in names
+        or f"+{name}" in names
+    )
 
 
 # how closely a residue has to match an rtp entry, tried in this order
@@ -221,6 +299,10 @@ def _rtp_scheme(
         (H abstraction) if each was bonded to one radical atom, which gets
         its charge (radical convention).
     Joined hydrogens get the name and type of their position in the entry.
+    At every level, each radical of the residue must be one in the entry
+    too: bonded there to a missing hydrogen or to a neighboring residue
+    (a broken bond between residues). Otherwise the entry describes another
+    protonation state, e.g. HID for a HIP that lost HE2.
     """
     residuetype = top_b.ff.residuetypes.get(variant)
     if residuetype is None:
@@ -275,6 +357,21 @@ def _rtp_scheme(
         charges[radical] = _format_charge(
             float(charges[radical]) + float(residuetype.atoms[name].charge)
         )
+
+    # next: every radical must be explained by the entry (missing hydrogen
+    # or bond to a neighboring residue)
+    for name, atom in named.items():
+        if atom.nr not in top_b.radicals:
+            continue
+        if not (
+            _bonded_in_template(residuetype, name) & missing
+            or _bonded_to_neighbor_in_template(residuetype, name)
+        ):
+            logger.debug(
+                f"rtp:{variant} ({level}) does not fit residue {residue.resnr}: "
+                f"radical {name} is not a radical in the entry."
+            )
+            return None
     return _Scheme(f"rtp:{variant} ({level})", charges, identities)
 
 
@@ -296,6 +393,7 @@ def _schemes(
     moved: dict[str, tuple[Optional[str], Optional[str]]],
     broken: set[str],
     matches: list[ProductTemplateMatch],
+    tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
 ) -> list[Callable[[], list[_Scheme]]]:
     """The charge schemes for a residue, most specific first, each computed on demand."""
     joined = {h for h, (_, partner_b) in moved.items() if partner_b in residue.atoms}
@@ -315,10 +413,16 @@ def _schemes(
         name = next(atom.residue for nr, atom in residue.atoms.items() if nr not in joined)
         found = []
         for level in RTP_MATCH_LEVELS:
-            for variant in residue_variants(name):
-                scheme = _rtp_scheme(top_b, residue, joined, variant, level)
-                if scheme is not None:
-                    found.append(scheme)
+            schemes = [
+                scheme
+                for variant in residue_variants(name)
+                if (scheme := _rtp_scheme(top_b, residue, joined, variant, level))
+                is not None
+            ]
+            # protonation states can fit the same atoms with different
+            # charges (CYX and CYM); those that keep the residue charge first
+            schemes.sort(key=lambda s: abs(_charge_change(s, residue)) > tolerance)
+            found.extend(schemes)
         return found
 
     # step 3: local rules
@@ -378,7 +482,9 @@ def assign_recipe_charges(
     # charge by an integer (steps 1 to 3, see _schemes)
     for residue in touched_residues(top_a, top_b, atom_nrs):
         scheme = _first_fitting_scheme(
-            residue, _schemes(top_a, top_b, residue, moved, broken, matches), tolerance
+            residue,
+            _schemes(top_a, top_b, residue, moved, broken, matches, tolerance),
+            tolerance,
         )
         if scheme is None:
             logger.warning(
@@ -388,6 +494,11 @@ def assign_recipe_charges(
             continue
         _apply(top_b, scheme)
         logger.info(f"Charges of residue {residue.resnr} from {scheme.source}.")
+
+
+def _charge_change(scheme: _Scheme, residue: _Residue) -> float:
+    """How much a scheme changes the charge of a residue compared to A."""
+    return sum(float(charge) for charge in scheme.charges.values()) - residue.charge_a
 
 
 def _first_fitting_scheme(
@@ -406,7 +517,7 @@ def _first_fitting_scheme(
             )
             continue
         for scheme in schemes:
-            change = sum(float(charge) for charge in scheme.charges.values()) - residue.charge_a
+            change = _charge_change(scheme, residue)
             if abs(change - round(change)) <= tolerance:
                 return scheme
             logger.debug(

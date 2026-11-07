@@ -503,3 +503,282 @@ def test_apply_recipe_schema_options():
     conserve = changer["topology"]["properties"]["conserve_transferred_h_charge"]
     assert conserve["deprecated"] is True
     assert "default" not in conserve
+
+
+# --- residues with the same residue number (merged topologies) ---------------------------------
+
+
+def _nr_of(atoms: dict[str, Atom], first_nr: int, last_nr: int, name: str) -> str:
+    return next(
+        nr for nr, atom in atoms.items() if first_nr <= int(nr) <= last_nr and atom.atom == name
+    )
+
+
+def _tyr_oh_radical(ff, resnr: str, first_nr: int) -> dict[str, Atom]:
+    """A Tyr with the rtp charges whose HH is abstracted: OH carries HH's charge (radical convention)."""
+    atoms = _template_residue(ff, "TYR", resnr, first_nr)
+    last_nr = first_nr + len(atoms) - 1
+    oh = _nr_of(atoms, first_nr, last_nr, "OH")
+    hh = _nr_of(atoms, first_nr, last_nr, "HH")
+    atoms[oh].bound_to_nrs.remove(hh)
+    atoms[oh].charge = f"{float(atoms[oh].charge) + float(atoms.pop(hh).charge):7.4f}"
+    return atoms
+
+
+def _hat_onto_tyr_oh(ff, donor: dict[str, Atom], donor_nr: str, h_nr: str, first_nr: int):
+    """Hydrogen h_nr moves from donor_nr to the OH radical of a Tyr with the same residue number.
+
+    The Tyr starts at atom first_nr. In B, bind_bond gave the hydrogen the
+    Tyr's residue (here the same number) and named it HX.
+    Returns (top_a, top_b, recipe_steps, Tyr OH number).
+    """
+    tyr = _tyr_oh_radical(ff, donor[donor_nr].resnr, first_nr)
+    oh = next(nr for nr, atom in tyr.items() if atom.atom == "OH")
+    top_a = _RecipeTopology({**donor, **tyr}, ff)
+    top_b = _RecipeTopology(deepcopy(top_a.atoms), ff)
+    _bond(top_b.atoms, donor_nr, h_nr, False)
+    _bond(top_b.atoms, oh, h_nr, True)
+    hydrogen = top_b.atoms[h_nr]
+    hydrogen.residue, hydrogen.atom = "TYR", "HX"
+    top_b.radicals = {donor_nr: top_b.atoms[donor_nr]}
+    steps = [Break(atom_id_1=donor_nr, atom_id_2=h_nr), Bind(atom_id_1=oh, atom_id_2=h_nr)]
+    return top_a, top_b, steps, oh
+
+
+def test_hat_between_residues_with_the_same_number_uses_both_templates(amber_ff, caplog):
+    """Two Tyr 5 on different chains stay two residues: donor and acceptor get their templates.
+
+    Grouped by residue number, they were one residue with two fragments, and
+    only the local rules ran: the hydrogen kept its HB2 charge on the OH.
+    """
+    donor = _template_residue(amber_ff, "TYR", "5", 1)
+    cb = _nr_of(donor, 1, 21, "CB")
+    hb2 = _nr_of(donor, 1, 21, "HB2")
+    top_a, top_b, steps, oh = _hat_onto_tyr_oh(amber_ff, donor, cb, hb2, 101)
+    template = amber_ff.residuetypes["TYR"].atoms
+
+    with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert "Charges of residue 5 from rtp:TYR (radical)" in caplog.text
+    assert "Charges of residue 5 from rtp:TYR (renamed hydrogen)" in caplog.text
+    assert "from local" not in caplog.text
+    hydrogen = top_b.atoms[hb2]
+    assert (hydrogen.atom, hydrogen.type) == ("HH", template["HH"].type)
+    assert np.isclose(float(hydrogen.charge), float(template["HH"].charge))
+    assert np.isclose(float(top_b.atoms[oh].charge), float(template["OH"].charge))
+    assert np.isclose(
+        float(top_b.atoms[cb].charge),
+        float(template["CB"].charge) + float(template["HB2"].charge),
+    )
+    assert np.isclose(_total_charge(top_b), _total_charge(top_a))
+
+
+def test_hat_from_non_integer_residue_with_the_same_number_keeps_its_charge(amber_ff, caplog):
+    """A donor that is not integer on its own (like a crosslink half) keeps its charge.
+
+    Grouped by residue number with the acceptor, the local rules made the
+    donor fragment integer, and the scheme was then rejected.
+    """
+    donor = {
+        "201": Atom(nr="201", type="OH", resnr="5", residue="DON", atom="O", cgnr="201",
+                    charge="-0.6000"),
+        "202": Atom(nr="202", type="HO", resnr="5", residue="DON", atom="HO", cgnr="202",
+                    charge="0.4000"),
+    }
+    _bond(donor, "201", "202", True)
+    top_a, top_b, steps, oh = _hat_onto_tyr_oh(amber_ff, donor, "201", "202", 1)
+
+    with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert "Charges of residue 5 from local" in caplog.text
+    assert "Charges of residue 5 from rtp:TYR (renamed hydrogen)" in caplog.text
+    assert "No charge scheme" not in caplog.text
+    assert np.isclose(float(top_b.atoms["201"].charge), -0.2)
+    assert np.isclose(_total_charge(top_b), _total_charge(top_a))
+
+
+def test_backbone_homolysis_keeps_the_split_residue_together(amber_ff, caplog):
+    """CA-C homolysis inside a Gly: one residue with two fragments, each made integer by the local rules."""
+    atoms = _template_residue(amber_ff, "GLY", "1", 1)
+    ca = _nr_of(atoms, 1, 99, "CA")
+    c = _nr_of(atoms, 1, 99, "C")
+    o = _nr_of(atoms, 1, 99, "O")
+    top_a = _RecipeTopology(atoms, amber_ff)
+    top_b = _RecipeTopology(deepcopy(atoms), amber_ff)
+    _bond(top_b.atoms, ca, c, False)
+    top_b.radicals = {ca: top_b.atoms[ca], c: top_b.atoms[c]}
+    steps = [Break(atom_id_1=ca, atom_id_2=c)]
+
+    with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert caplog.text.count("Charges of residue 1 from local") == 1
+    assert np.isclose(float(top_b.atoms[c].charge) + float(top_b.atoms[o].charge), 0.0)
+    assert np.isclose(_residue_charge(top_b, "1"), _residue_charge(top_a, "1"))
+
+
+def test_recombination_of_a_split_residue_is_one_residue(amber_ff, caplog):
+    """CA and C of a split Gly bind again: two residues in A, one in B, which fits the template."""
+    atoms = _template_residue(amber_ff, "GLY", "1", 1)
+    ca = _nr_of(atoms, 1, 99, "CA")
+    c = _nr_of(atoms, 1, 99, "C")
+    _bond(atoms, ca, c, False)
+    top_a = _RecipeTopology(atoms, amber_ff)
+    top_b = _RecipeTopology(deepcopy(atoms), amber_ff)
+    _bond(top_b.atoms, ca, c, True)
+    steps = [Bind(atom_id_1=ca, atom_id_2=c)]
+
+    with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert caplog.text.count("Charges of residue 1 from") == 1
+    assert "Charges of residue 1 from rtp:GLY (exact)" in caplog.text
+    _assert_template_charges(top_b, "1", "GLY")
+
+
+# --- protonation states (HIS = HID/HIE/HIP, ...) and radicals the rtp entry has to explain ----
+
+
+def test_residue_variants_include_protonation_states():
+    assert charges.residue_variants("HIS") == [
+        "HIS", "NHIS", "CHIS",
+        "HID", "NHID", "CHID",
+        "HIE", "NHIE", "CHIE",
+        "HIP", "NHIP", "CHIP",
+    ]
+    assert charges.residue_variants("LYN") == ["LYN", "NLYN", "CLYN", "LYS", "NLYS", "CLYS"]
+    assert charges.residue_variants("CYS")[3:6] == ["CYX", "NCYX", "CCYX"]
+
+
+def _template_charge(ff, template: str) -> float:
+    return sum(float(atom.charge) for atom in ff.residuetypes[template].atoms.values())
+
+
+def _hat_onto_cb(ff, template: str, residue: str):
+    """A hydroxyl hydrogen of DON 2 moves to the CB radical (HB2 abstracted) of residue 1.
+
+    Residue 1 is named residue and has the atoms and charges of the rtp entry
+    template; its CB carries HB2's charge (radical convention).
+    Returns (top_a, top_b, recipe_steps, hydrogen number).
+    """
+    atoms = _template_residue(ff, template, "1", 1, residue=residue)
+    cb = _nr_of(atoms, 1, 99, "CB")
+    hb2 = _nr_of(atoms, 1, 99, "HB2")
+    atoms[cb].bound_to_nrs.remove(hb2)
+    atoms[cb].charge = f"{float(atoms[cb].charge) + float(atoms.pop(hb2).charge):7.4f}"
+    atoms["101"] = Atom(nr="101", type="OH", resnr="2", residue="DON", atom="O", cgnr="101",
+                        charge=f"-{HYDROXYL_H_CHARGE}")
+    atoms["102"] = Atom(nr="102", type="HO", resnr="2", residue="DON", atom="HO", cgnr="102",
+                        charge=HYDROXYL_H_CHARGE)
+    _bond(atoms, "101", "102", True)
+    top_a = _RecipeTopology(atoms, ff)
+    top_b = _RecipeTopology(deepcopy(atoms), ff)
+    _bond(top_b.atoms, "101", "102", False)
+    _bond(top_b.atoms, cb, "102", True)
+    hydrogen = top_b.atoms["102"]
+    hydrogen.resnr, hydrogen.residue, hydrogen.atom = "1", residue, "HX"
+    top_b.radicals = {"101": top_b.atoms["101"]}
+    steps = [Break(atom_id_1="101", atom_id_2="102"), Bind(atom_id_1=cb, atom_id_2="102")]
+    return top_a, top_b, steps, "102"
+
+
+def test_hat_onto_his_uses_the_hie_entry(amber_ff, caplog):
+    """A HIS with the atoms of HIE gets the HIE charges; the hydrogen takes the free HB2 position."""
+    top_a, top_b, steps, h = _hat_onto_cb(amber_ff, "HIE", "HIS")
+
+    with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert "Charges of residue 1 from rtp:HIE (renamed hydrogen)" in caplog.text
+    hie = amber_ff.residuetypes["HIE"].atoms
+    assert (top_b.atoms[h].atom, top_b.atoms[h].type) == ("HB2", hie["HB2"].type)
+    _assert_template_charges(top_b, "1", "HIE")
+    assert np.isclose(_total_charge(top_b), _total_charge(top_a))
+
+
+@pytest.mark.parametrize("template", ["CYX", "CYM"])
+def test_cys_states_with_the_same_atoms_keep_their_charge(amber_ff, caplog, template):
+    """CYX (0) and CYM (-1) have the same atom names; each residue named CYS keeps its own state.
+
+    Both entries fit at the same level, the one that keeps the residue
+    charge is taken (a change of +-1 alone would also pass).
+    """
+    top_a, top_b, steps, _ = _hat_onto_cb(amber_ff, template, "CYS")
+
+    with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert f"Charges of residue 1 from rtp:{template} (renamed hydrogen)" in caplog.text
+    assert np.isclose(_residue_charge(top_b, "1"), _template_charge(amber_ff, template))
+    assert np.isclose(_total_charge(top_b), _total_charge(top_a))
+
+
+@pytest.mark.parametrize(
+    "template, residue, heavy, hydrogen, other_state",
+    [
+        ("HIP", "HIS", "NE2", "HE2", "HID"),
+        ("LYS", "LYS", "NZ", "HZ3", "LYN"),
+        ("ASH", "ASP", "OD2", "HD2", "ASP"),
+        ("GLH", "GLU", "OE2", "HE2", "GLU"),
+        ("CYS", "CYS", "SG", "HG", "CYX"),
+    ],
+)
+def test_abstraction_keeps_the_protonation_state(
+    amber_ff, caplog, template, residue, heavy, hydrogen, other_state
+):
+    """A residue that lost a hydrogen has the atom names of another protonation state.
+
+    E.g. HIP minus HE2 has the names of HID, but its NE2 radical is not a
+    radical in HID. The residue becomes a radical of its own state and keeps
+    its charge (the hydrogen's charge on the radical).
+    """
+    atoms = _template_residue(amber_ff, template, "1", 1, residue=residue)
+    heavy_nr = _nr_of(atoms, 1, 99, heavy)
+    h_nr = _nr_of(atoms, 1, 99, hydrogen)
+    atoms["101"] = Atom(nr="101", type="OH", resnr="2", residue="DON", atom="O", cgnr="101",
+                        charge="0.0000")
+    top_a = _RecipeTopology(atoms, amber_ff)
+    top_b = _RecipeTopology(deepcopy(atoms), amber_ff)
+    _bond(top_b.atoms, heavy_nr, h_nr, False)
+    _bond(top_b.atoms, "101", h_nr, True)
+    moved = top_b.atoms[h_nr]
+    moved.resnr, moved.residue, moved.atom = "2", "DON", "HX"
+    top_b.radicals = {heavy_nr: top_b.atoms[heavy_nr]}
+    steps = [Break(atom_id_1=heavy_nr, atom_id_2=h_nr), Bind(atom_id_1="101", atom_id_2=h_nr)]
+
+    with caplog.at_level(logging.DEBUG, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert f"rtp:{other_state} (exact) does not fit residue 1: radical {heavy}" in caplog.text
+    assert f"Charges of residue 1 from rtp:{template} (radical)" in caplog.text
+    entry = amber_ff.residuetypes[template].atoms
+    assert np.isclose(
+        float(top_b.atoms[heavy_nr].charge),
+        float(entry[heavy].charge) + float(entry[hydrogen].charge),
+    )
+    assert np.isclose(_residue_charge(top_b, "1"), _template_charge(amber_ff, template))
+    assert np.isclose(_total_charge(top_b), _total_charge(top_a))
+
+
+def test_radicals_of_a_broken_bond_between_residues_keep_the_exact_entry(amber_ff, caplog):
+    """C and N radicals after a C-N break between two Gly are explained by -C N in the entry."""
+    atoms = _template_residue(amber_ff, "GLY", "1", 1)
+    atoms.update(_template_residue(amber_ff, "GLY", "2", 11))
+    c = _nr_of(atoms, 1, 9, "C")
+    n = _nr_of(atoms, 11, 19, "N")
+    _bond(atoms, c, n, True)
+    top_a = _RecipeTopology(atoms, amber_ff)
+    top_b = _RecipeTopology(deepcopy(atoms), amber_ff)
+    _bond(top_b.atoms, c, n, False)
+    top_b.radicals = {c: top_b.atoms[c], n: top_b.atoms[n]}
+    steps = [Break(atom_id_1=c, atom_id_2=n)]
+
+    with caplog.at_level(logging.INFO, logger="kimmdy.topology.charges"):
+        charges.assign_recipe_charges(top_a, top_b, steps)
+
+    assert "Charges of residue 1 from rtp:GLY (exact)" in caplog.text
+    assert "Charges of residue 2 from rtp:GLY (exact)" in caplog.text
+    _assert_template_charges(top_b, "1", "GLY")
+    _assert_template_charges(top_b, "2", "GLY")
