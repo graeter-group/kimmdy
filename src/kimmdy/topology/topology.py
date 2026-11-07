@@ -14,7 +14,7 @@ from kimmdy.constants import (
 )
 from kimmdy.parsing import TopologyDict, empty_section, read_top, write_top
 from kimmdy.plugins import BasicParameterizer, Parameterizer
-from kimmdy.recipe import RecipeStep
+from kimmdy.recipe import Bind, RecipeStep
 from kimmdy.topology.atomic import (
     Angle,
     AngleType,
@@ -1401,11 +1401,20 @@ class Topology:
 
         This topology is the one after the steps (B), top_a the one before
         them (A). The residue templates decide (assign_recipe_names); atoms
-        that get another name get their improper dihedrals again.
+        that get another name get their improper dihedrals again, and so do
+        the atoms of the Bind steps: bind_bond built theirs while a moved
+        hydrogen still had its old name.
         """
         logger.info("Updating atom names and types")
         renamed = assign_recipe_names(top_a, self, recipe_steps)
-        self.reactive_molecule.update_impropers(renamed, self.ff)
+        if renamed:
+            bound = {
+                nr
+                for step in recipe_steps
+                if isinstance(step, Bind)
+                for nr in (step.atom_id_1, step.atom_id_2)
+            }
+            self.reactive_molecule.update_impropers(renamed | bound, self.ff)
 
     def update_charges(
         self,
