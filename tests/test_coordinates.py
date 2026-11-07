@@ -736,3 +736,155 @@ def test_parallel_dihedral_merge_matches_serial(arranged_tmp_path, case):
 
     # the same written lines, in the same order
     assert parallel_lines == serial_lines
+
+
+def _lj_test_ff():
+    """A small Amber-like force field: HO and HW without LJ size, H the smallest H type with one."""
+    return SimpleNamespace(
+        atomtypes={
+            "HO": SimpleNamespace(sigma="0.00000e+00", epsilon="0.00000e+00"),
+            "HW": SimpleNamespace(sigma="0.00000e+00", epsilon="0.00000e+00"),
+            "H": SimpleNamespace(sigma="1.06908e-01", epsilon="6.56888e-02"),
+            "HS": SimpleNamespace(sigma="1.06908e-01", epsilon="6.56888e-02"),
+            "H1": SimpleNamespace(sigma="2.47135e-01", epsilon="6.56888e-02"),
+            "HC": SimpleNamespace(sigma="2.64953e-01", epsilon="6.56888e-02"),
+            "OH": SimpleNamespace(sigma="3.06647e-01", epsilon="8.80314e-01"),
+        },
+        defaults=[["1", "2", "yes", "0.5", "0.8333"]],
+    )
+
+
+def test_find_lj_hydrogen_type_picks_smallest_lj_hydrogen():
+    """The stand-in for hydrogens without LJ size is the H type with the smallest non-zero size (H in Amber)."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.ff = _lj_test_ff()
+    assert merger._find_lj_hydrogen_type() == "H"
+
+
+@pytest.mark.parametrize(
+    "type_a, type_b, expected_b",
+    [
+        ("HO", "HC", "HC"),  # O-H onto carbon: B keeps the product type
+        ("HO", "HO", "H"),  # O-H onto oxygen
+        ("HW", "H", "H"),  # water H onto nitrogen
+    ],
+)
+def test_moving_lj_free_h_gets_lj_in_both_states(type_a, type_b, expected_b):
+    """A moving H without LJ size in A gets H in state A; state B keeps its type, charge and mass."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.retype_transferred_h = True
+    merger.transferred_h_type = "H"
+    merger.ff = _lj_test_ff()
+    # H 2 moves from atom 1 to atom 3; merge_atoms gave it its B type
+    h_a = Atom("2", type_a, "1", "RES", "H", "2", "0.4", "1.008")
+    if type_b != type_a:
+        h_a.typeB = type_b
+    h_b = Atom("2", type_b, "1", "RES", "H", "2", "0.4", "1.008")
+    merger.mol_a = SimpleNamespace(
+        atoms={"2": h_a},
+        bonds={
+            ("1", "2"): Bond("1", "2", funct="1", c0="0.0960", c1="462750.0"),
+            ("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0"),
+        },
+        angles={},
+        proper_dihedrals={},
+        improper_dihedrals={},
+        pairs={},
+    )
+    merger.mol_b = SimpleNamespace(
+        atoms={"2": h_b},
+        bonds={("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0")},
+    )
+    merger.affected_interactions = AffectedInteractions()
+    merger.moving_hydrogens = {"2"}
+
+    merger._retype_transferred_hydrogens()
+    merger._give_moving_hydrogens_lj_in_state_a()
+
+    assert h_a.type == "H"
+    assert h_a.typeB == expected_b
+    # GROMACS takes a missing chargeB from the atom type (0), so both are written
+    assert h_a.chargeB == "0.4"
+    assert h_a.massB == "1.008"
+
+
+def test_non_moving_lj_free_h_keeps_state_a_type():
+    """A water H that stays on its oxygen keeps its type in state A (its bond stays harmonic)."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.retype_transferred_h = True
+    merger.transferred_h_type = "H"
+    merger.ff = _lj_test_ff()
+    h_a = Atom("2", "HW", "1", "SOL", "HW1", "2", "0.4", "1.008")
+    h_a.typeB = "HO"
+    merger.mol_a = SimpleNamespace(atoms={"2": h_a})
+    merger.moving_hydrogens = set()
+
+    merger._give_moving_hydrogens_lj_in_state_a()
+
+    assert h_a.type == "HW"
+
+
+def test_lj_free_h_pairs_use_h_in_both_states():
+    """Pair terms and Morse lengths look up a hydrogen without LJ size as H, in state A and B."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.ff = _lj_test_ff()
+    merger.transferred_h_type = "H"
+    atoms = {
+        "1": Atom("1", "OH", "1", "RES", "O", "1", "-0.6", "16.0"),
+        "2": Atom("2", "HO", "1", "RES", "H", "2", "0.4", "1.008"),
+    }
+    merger.mol_a = SimpleNamespace(atoms=atoms)
+    merger.mol_b = SimpleNamespace(atoms=atoms)
+
+    for use_state_b in (False, True):
+        sigma, epsilon = merger._get_LJ_parameters("1", "2", use_state_b=use_state_b)
+        assert sigma == pytest.approx(0.5 * (0.106908 + 0.306647))
+        assert epsilon == pytest.approx(sqrt(0.0656888 * 0.880314))
+
+
+def test_check_hydrogen_lj_warns_for_h_without_lj(caplog, monkeypatch):
+    """The merge warns if a moving H, or a pair with an H whose atoms see each other, has no LJ."""
+    # an earlier test may have loaded a KIMMDY config, whose logging setup
+    # stops kimmdy records from reaching the root logger that caplog listens on
+    monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
+    caplog.set_level(logging.WARNING, logger="kimmdy.coordinates")
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.ff = _lj_test_ff()
+    o = Atom("1", "OH", "1", "RES", "O", "1", "-0.6", "16.0")
+    h = Atom("2", "HO", "1", "RES", "H", "2", "0.4", "1.008")
+    h.typeB = "H"
+    merger.mol_a = SimpleNamespace(atoms={"1": o, "2": h}, pairs={}, nrexcl="3")
+    merger.mol_b = SimpleNamespace(nrexcl="3")
+    merger.moving_hydrogens = {"2"}
+    # O and H are not bonded in A or B, so they see each other in both states
+    merger._bond_graph_a = {"1": set(), "2": set()}
+    merger._bond_graph_b = {"1": set(), "2": set()}
+    merger._pairs_a = set()
+    merger._pairs_b = set()
+    merger._explicit_exclusions_a = set()
+    merger._explicit_exclusions_b = set()
+
+    # moving H still HO (no LJ) in state A
+    merger._check_hydrogen_lj()
+    assert "moving H 2 has type HO without LJ size in state A" in caplog.text
+    caplog.clear()
+
+    # with H in state A the atom passes ...
+    h.type = "H"
+    merger._check_hydrogen_lj()
+    assert "Lennard-Jones core" not in caplog.text
+
+    # ... but a pair without LJ in A, where O and H see each other, does not
+    merger.mol_a.pairs = {
+        ("1", "2"): Pair(
+            "1", "2", funct="1", c0="0.15332", c1="0.00000", c2="0.20678", c3="0.24047"
+        )
+    }
+    merger._check_hydrogen_lj()
+    assert "pair 1-2 has no LJ in state A" in caplog.text
+    caplog.clear()
+
+    # the same pair passes when O and H are bonded (excluded) in A
+    merger._bond_graph_a = {"1": {"2"}, "2": {"1"}}
+    merger._check_hydrogen_lj()
+    assert "Lennard-Jones core" not in caplog.text
