@@ -112,6 +112,27 @@ def rtp_psi_terms(rtp: Path, residue: str) -> dict[str, tuple[float, float]]:
     return {n: (float(phase), float(k)) for n, (phase, k) in terms.items()}
 
 
+def _residue_of(top: Topology, resnr: str) -> dict[str, Atom]:
+    """The atoms of a residue of the reactive molecule, found along the bonds."""
+    mol = top.reactive_molecule
+    atom = next(a for a in mol.atoms.values() if a.resnr == resnr)
+    return get_residue_by_bonding(atom, mol.atoms)
+
+
+def _atom_impropers(mol, atom_nr: str, ff) -> dict:
+    """The rtp impropers that contain one atom.
+
+    From the residue lookups of the atom's residue and its previous and next
+    residue, as the former MoleculeType._get_atom_improper_dihedrals gave them.
+    """
+    residue = get_residue_by_bonding(mol.atoms[atom_nr], mol.atoms)
+    neighbors = [a for a in mol._get_neighbor_residue_atoms(residue) if a is not None]
+    impropers = {}
+    for res in [residue, *(get_residue_by_bonding(a, mol.atoms) for a in neighbors)]:
+        impropers.update(mol._get_residue_improper_dihedrals(res, ff) or {})
+    return {key: specs for key, specs in impropers.items() if atom_nr in key}
+
+
 @pytest.fixture()
 def hexala_radical_top_fix(assetsdir, filedir) -> Topology:
     """Hexala without HA of residue 2, so CA 9 is a radical (HA charge moved onto CA 9)."""
@@ -445,6 +466,15 @@ class TestTopology:
         with pytest.raises(ValueError):
             top.bind_bond(bond_key)
 
+        # impropers are set from the residue templates after the steps
+        top.update_names_LJ(
+            og_top,
+            [
+                Break(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+                Bind(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+            ],
+        )
+
         top.to_path("/tmp/top.top")
 
         assert top.bonds == og_top.bonds
@@ -479,6 +509,14 @@ class TestTopology:
         assert top.bonds.get(bond_key) is None
         top.bind_bond(bond_key)
         assert top.bonds.get(bond_key) is not None
+        # impropers are set from the residue templates after the steps
+        top.update_names_LJ(
+            og_top,
+            [
+                Break(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+                Bind(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+            ],
+        )
 
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
@@ -742,7 +780,7 @@ class TestHexalaTopology:
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
         proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
-        improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
+        improper_dihedrals = _atom_impropers(protein, atomnr, top.ff)
         assert len(bonds) == 4
         assert len(angles) == 13
         assert len(proper_dihedrals) == 25
@@ -752,7 +790,7 @@ class TestHexalaTopology:
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
         proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
-        improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
+        improper_dihedrals = _atom_impropers(protein, atomnr, top.ff)
         assert len(bonds) == 3
         assert len(angles) == 8
         assert len(proper_dihedrals) == 18
@@ -880,11 +918,10 @@ class TestHexalaTopology:
         top = deepcopy(hexala_radical_top_fix)
         mol = top.reactive_molecule
         assert list(top.radicals) == ["9"]
+        top_a = deepcopy(top)
 
         # backbone impropers on C 14 (residue 2) and N 56 (residue 7) before any transfer
-        before = {
-            nr: set(mol._get_atom_improper_dihedrals(nr, top.ff)) for nr in ("14", "56")
-        }
+        before = {nr: set(_atom_impropers(mol, nr, top.ff)) for nr in ("14", "56")}
 
         # H 61 (residue 7) moves onto the radical CA 9 (residue 2),
         # then H 11 (residue 2) moves onto the new radical CB 60 (residue 7)
@@ -892,6 +929,16 @@ class TestHexalaTopology:
         top.bind_bond(("9", "61"))
         top.break_bond(("10", "11"))
         top.bind_bond(("60", "11"))
+        # the residues match their rtp entries once the moved H have their names
+        top.update_names_LJ(
+            top_a,
+            [
+                Break(atom_id_1="60", atom_id_2="61"),
+                Bind(atom_id_1="9", atom_id_2="61"),
+                Break(atom_id_1="10", atom_id_2="11"),
+                Bind(atom_id_1="60", atom_id_2="11"),
+            ],
+        )
         residue_2 = get_residue_by_bonding(atom=mol.atoms["14"], atoms=mol.atoms)
         residue_7 = get_residue_by_bonding(atom=mol.atoms["64"], atoms=mol.atoms)
         assert "61" in residue_2 and "11" in residue_7
@@ -908,7 +955,7 @@ class TestHexalaTopology:
 
         # so the backbone impropers are the same as before the transfers
         for nr in ("14", "56"):
-            assert set(mol._get_atom_improper_dihedrals(nr, top.ff)) == before[nr]
+            assert set(_atom_impropers(mol, nr, top.ff)) == before[nr]
 
 
 class TestA99SBdispPsi:
@@ -1180,24 +1227,17 @@ class TestDimerization:
             C5    N3    C4    O4
             C4    C2    N3    H3
         """
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "12", top_target.ff
-        )
+        mol = top_target.reactive_molecule
+        atom_impropers = _atom_impropers(mol, "12", top_target.ff)
         assert list(atom_impropers.keys()) == [("9", "11", "12", "23")]
 
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "14", top_target.ff
-        )
+        atom_impropers = _atom_impropers(mol, "14", top_target.ff)
         assert list(atom_impropers.keys()) == [("14", "21", "19", "20")]
 
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "44", top_target.ff
-        )
+        atom_impropers = _atom_impropers(mol, "44", top_target.ff)
         assert list(atom_impropers.keys()) == [("41", "43", "44", "55")]
 
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "46", top_target.ff
-        )
+        atom_impropers = _atom_impropers(mol, "46", top_target.ff)
         assert list(atom_impropers.keys()) == [("46", "53", "51", "52")]
 
     def test_dimerization(self, top_init: Topology, top_target: Topology):
@@ -1222,8 +1262,17 @@ class TestDimerization:
         # NOTE: the plugin would also update partial charges,
         # we don't test that here
 
+        top_a = deepcopy(top)
         top.bind_bond(("14", "46"))
         top.bind_bond(("12", "44"))
+        # impropers are set from the residue templates after the steps
+        top.update_names_LJ(
+            top_a,
+            [
+                Bind(atom_id_1="14", atom_id_2="46"),
+                Bind(atom_id_1="12", atom_id_2="44"),
+            ],
+        )
 
         top.to_path("/tmp/updated.top")
 
@@ -1634,3 +1683,81 @@ def test_repeated_template_impropers_in_all_modes(mode, expected):
     template = ResidueType.from_section("ALA", section, repeated_lines=mode)
     (term,) = template.improper_dihedrals[("N", "CA", "C", "+N")]
     assert (term.c0, term.c1) == expected
+
+
+class TestResidueImpropers:
+    def test_termini_get_the_impropers_of_their_terminal_entries(self, r10_a99sbdisp_top_fix):
+        """pdb2gmx built residue 1 from NSER and residue 86 from CTYR; rebuilding gives the same impropers.
+
+        The topology names them SER and TYR. Matched by atoms and bonds, the
+        N-terminus gets no psi correction (N CA C +N) and the C-terminus
+        keeps CA OC1 C OC2.
+        """
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        before = set(mol.improper_dihedrals)
+        first, last = _residue_of(top, "1"), _residue_of(top, "86")
+
+        mol.update_residue_impropers([first, last], top.ff)
+
+        def names(key):
+            return [mol.atoms[nr].atom for nr in key]
+
+        assert set(mol.improper_dihedrals) == before
+        assert not any(
+            names(key) == ["N", "CA", "C", "N"] and key[0] in first
+            for key in mol.improper_dihedrals
+        )
+        assert any(
+            sorted(names(key)) == ["C", "CA", "OC1", "OC2"] for key in mol.improper_dihedrals
+        )
+
+    def test_residue_without_matching_entry_keeps_its_impropers(
+        self, r10_a99sbdisp_top_fix, caplog
+    ):
+        """A SER whose OG is renamed matches no rtp entry: a warning, and its impropers stay."""
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        residue = _residue_of(top, "2")
+        next(a for a in residue.values() if a.atom == "OG").atom = "OX"
+        before = deepcopy(mol.improper_dihedrals)
+
+        with caplog.at_level(logging.WARNING):
+            mol.update_residue_impropers([residue], top.ff)
+
+        assert mol.improper_dihedrals == before
+        assert "No rtp entry matches residue SER 2" in caplog.text
+
+    def test_split_residue_keeps_its_impropers_without_warning(
+        self, r10_a99sbdisp_top_fix, caplog
+    ):
+        """A residue split by a broken CA-C bond is skipped silently."""
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        residue = _residue_of(top, "2")
+        ca = next(nr for nr, a in residue.items() if a.atom == "CA")
+        c = next(nr for nr, a in residue.items() if a.atom == "C")
+        top.break_bond((ca, c))
+        before = deepcopy(mol.improper_dihedrals)
+
+        with caplog.at_level(logging.WARNING):
+            mol.update_residue_impropers([residue], top.ff)
+
+        assert mol.improper_dihedrals == before
+        assert "No rtp entry" not in caplog.text
+
+    def test_impropers_with_two_atoms_outside_are_kept(self, r10_a99sbdisp_top_fix):
+        """An improper with two atoms outside the residue (e.g. of a crosslink) belongs to no residue."""
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        residue = _residue_of(top, "2")
+        own = sorted(residue, key=int)
+        far = sorted(_residue_of(top, "4"), key=int)
+        key = (own[0], own[1], far[0], far[1])
+        mol.improper_dihedrals[key] = MultipleDihedrals(
+            *key, "4", dihedrals={"": Dihedral(*key, "4")}
+        )
+
+        mol.update_residue_impropers([residue], top.ff)
+
+        assert key in mol.improper_dihedrals
