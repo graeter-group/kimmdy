@@ -18,6 +18,7 @@ from kimmdy.topology.templates import (
     match_residue,
 )
 from kimmdy.topology.topology import Topology
+from kimmdy.topology.utils import get_residue_by_bonding
 
 FILEDIR = Path(__file__).parent / "test_files" / "test_topology"
 
@@ -36,6 +37,19 @@ def amber_ff(imree_raw):
 @pytest.fixture
 def hexala() -> Topology:
     return Topology(read_top(FILEDIR / "hexala.top"))
+
+
+@pytest.fixture(scope="module")
+def r10() -> Topology:
+    """One SSGP-[GRGDSPYS]10-GY chain from pdb2gmx with a99SB-disp (rtp NSER ... CTYR)."""
+    return Topology(
+        read_top(FILEDIR / "R10_a99SBdisp.top", ffdir=FILEDIR / "a99SBdisp.ff")
+    )
+
+
+def _r10_residue(top: Topology, resnr: str) -> dict[str, Atom]:
+    atom = next(a for a in top.atoms.values() if a.resnr == resnr)
+    return get_residue_by_bonding(atom, top.atoms)
 
 
 def _residue(ff, template: str, residue: Optional[str] = None) -> dict[str, Atom]:
@@ -288,7 +302,7 @@ def test_find_radicals_decides_ambiguous_atoms_by_template(imree_raw):
     assert mol.atoms[ne].is_radical
 
 
-def test_update_impropers_restores_the_template_impropers(hexala):
+def test_update_residue_impropers_restores_the_template_impropers(hexala):
     mol = hexala.reactive_molecule
     before = deepcopy(mol.improper_dihedrals)
     with_h = [key for key in mol.improper_dihedrals if "8" in key]
@@ -296,7 +310,8 @@ def test_update_impropers_restores_the_template_impropers(hexala):
     for key in with_h:
         mol.improper_dihedrals.pop(key)
 
-    mol.update_impropers({"8"}, hexala.ff)
+    residue = get_residue_by_bonding(mol.atoms["8"], mol.atoms)
+    mol.update_residue_impropers([residue], hexala.ff)
 
     assert mol.improper_dihedrals == before
 
@@ -304,9 +319,8 @@ def test_update_impropers_restores_the_template_impropers(hexala):
 def test_update_all_names_swapped_hydrogens_and_sets_their_impropers(hexala):
     """Amide H and HB1 of Ala 2 swap places: the templates name them by their new positions.
 
-    bind_bond leaves the names, so the -C CA N H improper is first set with
-    the old names; update_all renames both and sets it again on the new
-    amide H.
+    bind_bond leaves the names and the impropers; update_all renames both
+    and sets the -C CA N H improper on the new amide H.
     """
     top = hexala
     top_a = deepcopy(top)
@@ -360,9 +374,10 @@ def test_names_come_from_the_template_whatever_the_charges(amber_ff):
     top_b.radicals = {"31": b["31"]}
     steps = [Break(atom_id_1="31", atom_id_2=h), Bind(atom_id_1=ca, atom_id_2=h)]
 
-    renamed = assign_recipe_names(top_a, top_b, steps)
+    residues = assign_recipe_names(top_a, top_b, steps)
 
-    assert renamed == {h}
+    assert sorted(residue.resnr for residue in residues) == ["1", "2"]
+    assert top_a.atoms[h].atom != b[h].atom  # h got another name
     assert (b[h].atom, b[h].type) == ("HA2", "H1")
     assert b[h].mass == amber_ff.atomtypes["H1"].mass
 
@@ -419,8 +434,45 @@ def test_hydrogen_moving_into_a_residue_without_rtp_entry_gets_the_type_of_its_p
     top_b.radicals = {"31": b["31"]}
     steps = [Break(atom_id_1="31", atom_id_2=h), Bind(atom_id_1=cb, atom_id_2=h)]
 
-    renamed = assign_recipe_names(top_a, top_b, steps)
+    residues = assign_recipe_names(top_a, top_b, steps)
 
-    assert renamed == set()
+    assert sorted(residue.resnr for residue in residues) == ["1", "2"]
+    assert top_a.atoms[h].atom == b[h].atom  # h keeps its name
     assert (b[h].atom, b[h].type) == ("HO", "HC")
     assert b[h].mass == amber_ff.atomtypes["HC"].mass
+
+
+def test_rtp_template_picks_terminal_entries_by_atoms(r10):
+    """pdb2gmx names the terminal residues SER and TYR; their atoms and bonds pick NSER and CTYR."""
+    templates = r10.ff.templates
+    assert templates.rtp_template(_r10_residue(r10, "1")).name == "NSER"
+    assert templates.rtp_template(_r10_residue(r10, "2")).name == "SER"
+    assert templates.rtp_template(_r10_residue(r10, "86")).name == "CTYR"
+
+
+def test_rtp_template_matches_a_radical_without_its_hydrogen(r10):
+    """A SER without HA (abstracted) matches SER at the radical level."""
+    residue = _r10_residue(r10, "2")
+    radical = {nr: a for nr, a in residue.items() if a.atom != "HA"}
+    assert r10.ff.templates.rtp_template(radical).name == "SER"
+
+
+def test_rtp_template_is_none_if_no_entry_fits(r10):
+    """A SER without OG (a heavy atom) fits no entry."""
+    residue = _r10_residue(r10, "2")
+    broken = {nr: a for nr, a in residue.items() if a.atom != "OG"}
+    assert r10.ff.templates.rtp_template(broken) is None
+
+
+def test_update_names_LJ_sets_the_impropers_of_a_bind_without_renaming(hexala):
+    """Break and Bind of the amide H 8 of Ala 2 rename nothing; update_names_LJ still sets its impropers."""
+    top = hexala
+    top_a = deepcopy(top)
+    steps = [Break(atom_id_1="7", atom_id_2="8"), Bind(atom_id_1="7", atom_id_2="8")]
+    top.break_bond(("7", "8"))
+    top.bind_bond(("7", "8"))
+    assert ("5", "9", "7", "8") not in top.improper_dihedrals  # left to update_names_LJ
+
+    top.update_names_LJ(top_a, steps)
+
+    assert top.improper_dihedrals == top_a.improper_dihedrals

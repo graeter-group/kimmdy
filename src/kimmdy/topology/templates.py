@@ -24,8 +24,8 @@ Users:
 - Topology.update_names_LJ: names, types and masses of the residues a
   recipe segment touched (assign_recipe_names)
 - kimmdy.topology.charges: their charges (Topology.update_charges)
-- MoleculeType._get_atom_improper_dihedrals: the rtp entry whose impropers
-  a residue gets (TemplateLibrary.rtp_template)
+- MoleculeType._get_residue_improper_dihedrals: the rtp entry whose
+  impropers a residue gets (TemplateLibrary.rtp_template)
 - MoleculeType.find_radicals: atoms whose type allows several numbers of
   bonds (TemplateLibrary.radical_by_template)
 """
@@ -471,21 +471,26 @@ class TemplateLibrary:
         return [self.rtp[name] for name in residue_variants(residue) if name in self.rtp]
 
     def rtp_template(self, residue: dict[str, Atom]) -> Optional[ResidueTemplate]:
-        """The rtp entry of a residue, by its name and atom names.
+        """The rtp entry of a residue, by its atoms and bonds.
 
-        The entry of the residue's name if there is one, else the variant
-        (rtp_variants) that has all atom names of the residue and the fewest
-        others, e.g. HIE for a HIS with HE2. Hydrogens named HX are not
-        counted.
+        The first entry of the residue's name and its variants (rtp_variants)
+        that the residue matches (match_residue), trying the levels of
+        MATCH_LEVELS in order: e.g. NSER for an N-terminal SER (H1, H2, H3),
+        HIE for a HIS with HE2, the plain entry for a radical without its
+        abstracted hydrogen. Hydrogens named HX may take any free hydrogen
+        position. If several entries match at one level, the first is used.
+        None if no entry matches.
         """
         if not residue:
             return None
         name = next(iter(residue.values())).residue
-        if name in self.rtp:
-            return self.rtp[name]
-        names = {atom.atom for atom in residue.values()} - {UNNAMED_HYDROGEN}
-        options = [t for t in self.rtp_variants(name) if names <= t.atoms.keys()]
-        return min(options, key=lambda t: len(t.atoms), default=None)
+        unnamed = [nr for nr, atom in residue.items() if atom.atom == UNNAMED_HYDROGEN]
+        templates = self.rtp_variants(name)
+        for level in MATCH_LEVELS:
+            for template in templates:
+                if match_residue(residue, template, level, renamed=unnamed) is not None:
+                    return template
+        return None
 
     def _element(self, atom_type: str) -> Optional[int]:
         """Atomic number of an atom type: its at.num, else by its mass; None if unknown."""
@@ -896,25 +901,21 @@ def _residue_identities(
     return "rtp positions of the hydrogens", identities
 
 
-def _set_identities(top: Topology, identities: dict[str, tuple[str, str, Optional[str]]]) -> set[str]:
-    """Set names, types and masses (None: the type's mass); returns the atoms whose names changed."""
-    renamed = set()
+def _set_identities(top: Topology, identities: dict[str, tuple[str, str, Optional[str]]]) -> None:
+    """Set names, types and masses (None: the type's mass)."""
     for nr, (name, atom_type, mass) in identities.items():
         atom = top.atoms[nr]
-        if atom.atom != name:
-            renamed.add(nr)
         atom.atom = name
         atom.type = atom_type
         if mass is not None:
             atom.mass = mass
         elif atom_type in top.ff.atomtypes:
             atom.mass = top.ff.atomtypes[atom_type].mass
-    return renamed
 
 
 def assign_recipe_names(
     top_a: Topology, top_b: Topology, recipe_steps: list[RecipeStep]
-) -> set[str]:
+) -> list[TouchedResidue]:
     """Set names, types and masses of the residues recipe steps touched, from their templates.
 
     top_a is the topology before the steps and stays unchanged, top_b the
@@ -932,16 +933,15 @@ def assign_recipe_names(
        it stays if that type is not in the force field
 
     The templates decide by the atoms and bonds alone, not by the charges.
-    Returns the atoms whose names changed, whose improper dihedrals have to
-    be set again.
+    Returns the touched residues (touched_residues), with their atoms in B.
     """
     atom_nrs, _ = recipe_bond_atoms(recipe_steps)
     moved = moved_hydrogens(top_a, top_b, atom_nrs)
-    renamed: set[str] = set()
-    for residue in touched_residues(top_a, top_b, atom_nrs):
+    residues = touched_residues(top_a, top_b, atom_nrs)
+    for residue in residues:
         joined = joined_hydrogens(residue, moved)
         source, identities = _residue_identities(top_a, top_b, residue, joined, moved)
         if identities:
-            renamed |= _set_identities(top_b, identities)
+            _set_identities(top_b, identities)
             logger.info(f"Names and types of residue {residue.resnr} from {source}.")
-    return renamed
+    return residues
