@@ -478,18 +478,26 @@ class TemplateLibrary:
         MATCH_LEVELS in order: e.g. NSER for an N-terminal SER (H1, H2, H3),
         HIE for a HIS with HE2, the plain entry for a radical without its
         abstracted hydrogen. Hydrogens named HX may take any free hydrogen
-        position. If several entries match at one level, the first is used.
-        None if no entry matches.
+        position. If they cannot all take one, the residue is matched again
+        without them: an HX has no place in the entry and is in none of its
+        impropers, so it does not decide; a position it would have taken
+        counts as abstracted (radical level). If several entries match at one
+        level, the first is used. None if no entry matches.
         """
         if not residue:
             return None
         name = next(iter(residue.values())).residue
-        unnamed = [nr for nr, atom in residue.items() if atom.atom == UNNAMED_HYDROGEN]
+        unnamed = {nr for nr, atom in residue.items() if atom.atom == UNNAMED_HYDROGEN}
         templates = self.rtp_variants(name)
-        for level in MATCH_LEVELS:
-            for template in templates:
-                if match_residue(residue, template, level, renamed=unnamed) is not None:
-                    return template
+        attempts = [(residue, unnamed)]
+        if unnamed:
+            without = {nr: atom for nr, atom in residue.items() if nr not in unnamed}
+            attempts.append((without, set()))
+        for atoms, renamed in attempts:
+            for level in MATCH_LEVELS:
+                for template in templates:
+                    if match_residue(atoms, template, level, renamed=renamed) is not None:
+                        return template
         return None
 
     def _element(self, atom_type: str) -> Optional[int]:
@@ -885,7 +893,8 @@ def _residue_identities(
                 }
 
     # next: 3. each hydrogen that moved in by its position on its partner;
-    # without an rtp entry it keeps its name and gets the type for its partner
+    # if no rtp entry matches (e.g. a residue split by a broken bond) it is
+    # HX with the type for its partner, or its own type if there is none
     others = {nr: atom for nr, atom in residue.atoms.items() if nr not in joined}
     identities = {}
     for h in sorted(joined, key=int):
@@ -894,9 +903,7 @@ def _residue_identities(
         identity = templates.hydrogen_identity(others, partner, hydrogen, top_b.atoms)
         if identity is None:
             h_type = templates.hydrogen_type_on(partner, hydrogen, top_b.atoms)
-            if h_type is None:
-                continue
-            identity = (hydrogen.atom, h_type)
+            identity = (UNNAMED_HYDROGEN, h_type or hydrogen.type)
         identities[h] = (*identity, None)
     return "rtp positions of the hydrogens", identities
 
@@ -928,9 +935,9 @@ def assign_recipe_names(
        the hydrogens that moved into the residue
     3. else each hydrogen that moved in takes its position on its partner in
        the residue's rtp entry, or HX (TemplateLibrary.hydrogen_identity);
-       without an entry it keeps its name. Where neither names a type, the
-       type comes from its partner (TemplateLibrary.hydrogen_type_on), or
-       it stays if that type is not in the force field
+       if no entry matches the residue it is HX too. Where neither names a
+       type, the type comes from its partner (TemplateLibrary.hydrogen_type_on),
+       or it stays if that type is not in the force field
 
     The templates decide by the atoms and bonds alone, not by the charges.
     Returns the touched residues (touched_residues), with their atoms in B.

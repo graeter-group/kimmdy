@@ -416,7 +416,7 @@ def test_hydrogen_type_on_an_unknown_partner_type_is_none(amber_ff):
 
 
 def test_hydrogen_moving_into_a_residue_without_rtp_entry_gets_the_type_of_its_partner(amber_ff):
-    """A hydroxyl H that moves onto the CB radical of an Ala named XYZ keeps its name and becomes HC."""
+    """A hydroxyl H that moves onto the CB radical of an Ala named XYZ is named HX and becomes HC."""
     atoms = _residue(amber_ff, "ALA", "XYZ")
     cb = _abstract(atoms, "HB3")
     atoms["31"] = Atom(nr="31", type="OH", resnr="2", residue="DON", atom="O", cgnr="31",
@@ -437,8 +437,8 @@ def test_hydrogen_moving_into_a_residue_without_rtp_entry_gets_the_type_of_its_p
     residues = assign_recipe_names(top_a, top_b, steps)
 
     assert sorted(residue.resnr for residue in residues) == ["1", "2"]
-    assert top_a.atoms[h].atom == b[h].atom  # h keeps its name
-    assert (b[h].atom, b[h].type) == ("HO", "HC")
+    # no rtp entry matches XYZ: h is HX, with the type for its partner
+    assert (b[h].atom, b[h].type) == ("HX", "HC")
     assert b[h].mass == amber_ff.atomtypes["HC"].mass
 
 
