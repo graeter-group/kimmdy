@@ -1713,9 +1713,12 @@ class TestResidueImpropers:
         )
 
     def test_residue_without_matching_entry_keeps_its_impropers(
-        self, r10_a99sbdisp_top_fix, caplog
+        self, r10_a99sbdisp_top_fix, caplog, monkeypatch
     ):
         """A SER whose OG is renamed matches no rtp entry: a warning, and its impropers stay."""
+        # an earlier test may have loaded a KIMMDY config, whose logging setup
+        # stops kimmdy records from reaching the root logger that caplog listens on
+        monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
         top = deepcopy(r10_a99sbdisp_top_fix)
         mol = top.reactive_molecule
         residue = _residue_of(top, "2")
