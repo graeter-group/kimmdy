@@ -1,6 +1,8 @@
 """Reaction plugin building blocks"""
 
 import logging
+from collections import Counter
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, TypeAlias, TypedDict
 
@@ -8,7 +10,7 @@ import MDAnalysis as mda
 import numpy as np
 from MDAnalysis.lib.distances import calc_bonds
 
-from kimmdy.constants import FALLBACK_EDISSOC, H_PLANCK, KB, R
+from kimmdy.constants import FALLBACK_EDISSOC, FFFUNC, H_PLANCK, KB, R
 from kimmdy.parsing import Plumed_dict, read_distances_dat, read_edissoc, read_plumed
 from kimmdy.topology.atomic import BondId
 from kimmdy.topology.topology import Topology
@@ -41,6 +43,87 @@ PLUMED_DEPRECATION = (
 
 def _log_deprecated(name: str, reason: str) -> None:
     logger.warning(f"Deprecated function {name}: {reason}")
+
+
+@dataclass
+class BondParameters:
+    """Parameters of one bond for force and rate calculations.
+
+    b0 in nm and kb in kJ/mol/nm^2. For an explicit Morse bond, `morse`
+    holds its well depth D in kJ/mol and beta in 1/nm, and kb is the
+    curvature 2*D*beta^2 of the Morse well at b0.
+    `source` tells where the parameters come from.
+    """
+
+    b0: float
+    kb: float
+    morse: Optional[tuple[float, float]] = None
+    source: str = "bondtype"
+
+
+def get_bond_parameters(top: Topology, ai_nr: str, aj_nr: str) -> BondParameters:
+    """Parameters of the bond between two atoms.
+
+    Uses the explicit parameters of the bond in the topology if present
+    (harmonic bonds, funct 1, and Morse bonds, funct 3), otherwise the
+    force field bondtype of the atom types.
+    """
+    bond = top.bonds.get((ai_nr, aj_nr))
+    if bond is None:
+        bond = top.bonds.get((aj_nr, ai_nr))
+    source = "bondtype"
+    if bond is not None and bond.c0 is not None and bond.c1 is not None:
+        if bond.funct == FFFUNC["harmonic_bond"]:
+            return BondParameters(
+                b0=float(bond.c0), kb=float(bond.c1), source="explicit_harmonic"
+            )
+        if bond.funct == FFFUNC["morse_bond"] and bond.c2 is not None:
+            b0, depth, beta = float(bond.c0), float(bond.c1), float(bond.c2)
+            return BondParameters(
+                b0=b0,
+                kb=2 * depth * beta**2,
+                morse=(depth, beta),
+                source="explicit_morse",
+            )
+        source = f"bondtype (explicit funct {bond.funct} unsupported)"
+
+    ai = top.atoms[ai_nr]
+    aj = top.atoms[aj_nr]
+    bondtype = top.ff.bondtypes.get((ai.type, aj.type))
+    if bondtype is None:
+        # attempt the reverse key
+        bondtype = top.ff.bondtypes.get((aj.type, ai.type))
+    if not bondtype or bondtype.c0 is None or bondtype.c1 is None:
+        m = (
+            f"Could not find bondtype ({ai.type}, {aj.type}) of atoms with ids "
+            f"{ai_nr} and {aj_nr}"
+        )
+        logger.error(m)
+        raise ValueError(m)
+    return BondParameters(b0=float(bondtype.c0), kb=float(bondtype.c1), source=source)
+
+
+def bond_parameter_summary(sources: Counter) -> str:
+    """One line counting the sources of bond parameters."""
+    counts = ", ".join(f"{k}: {n}" for k, n in sources.most_common())
+    return f"Bond parameters of {sum(sources.values())} bonds: {counts}"
+
+
+def bond_forces(
+    ds: np.ndarray, params: BondParameters, edis: float, morse: bool
+) -> np.ndarray:
+    """Forces in a bond at distances ds in kJ/mol/nm.
+
+    An explicit Morse bond uses its own Morse potential. Other bonds use
+    the Morse potential from kb and edis if `morse`, else the harmonic one.
+    """
+    if params.morse is not None:
+        depth, beta = params.morse
+        return calculate_forces(ds=ds, b0=params.b0, edis=depth, beta=beta)
+    if morse:
+        beta = calculate_beta(kb=params.kb, edis=edis)
+        return calculate_forces(ds=ds, b0=params.b0, edis=edis, beta=beta)
+    return calculate_harmonic_forces(ds=ds, b0=params.b0, k=params.kb)
 
 
 def bondstats_to_csv(stats: BondStats, path: str | Path):
@@ -206,11 +289,20 @@ def get_bondstats(
         edissoc = None
 
     stats: BondStats = {}
+    sources = Counter()
     for bondkey, plumed_id in bond_to_plumed_id.items():
         ds = np.asarray([values[plumed_id] for values in distances.values()])
+        params = get_bond_parameters(top, bondkey[0], bondkey[1])
+        sources[params.source] += 1
         stats[bondkey] = _stats_for_bond(
-            top=top, bondkey=bondkey, bond_id=plumed_id, ds=ds, edissoc=edissoc
+            top=top,
+            bondkey=bondkey,
+            bond_id=plumed_id,
+            ds=ds,
+            edissoc=edissoc,
+            params=params,
         )
+    logger.debug(bond_parameter_summary(sources))
     return stats
 
 
@@ -220,23 +312,11 @@ def _stats_for_bond(
     bond_id: str,
     ds: np.ndarray,
     edissoc: Optional[dict],
+    params: BondParameters,
 ) -> Stats:
     """Mean distance and forces of one bond from its distances in nm."""
     ai = top.atoms[bondkey[0]]
     aj = top.atoms[bondkey[1]]
-    typekey = (ai.type, aj.type)
-    bondtype = top.ff.bondtypes.get(typekey)
-    if bondtype is None:
-        # attempt the reverse key
-        typekey = (aj.type, ai.type)
-        bondtype = top.ff.bondtypes.get(typekey)
-    if not bondtype or bondtype.c0 is None or bondtype.c1 is None:
-        m = f"Could not find bondtype of atoms with ids {ai.nr} and {aj.nr}"
-        logger.error(m)
-        raise ValueError(m)
-    b0 = float(bondtype.c0)
-    kb = float(bondtype.c1)
-
     if edissoc is not None:
         edis = get_edissoc_from_atomnames(
             atomnames=[ai.atom, aj.atom], edissoc=edissoc, residue=ai.residue
@@ -248,17 +328,19 @@ def _stats_for_bond(
 
     mean_d = float(np.mean(ds))
 
-    beta = calculate_beta(kb=kb, edis=edis)
-    forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
-    mean_f = float(np.mean(forces))
-    harmonic_f = float(np.mean(calculate_harmonic_forces(ds=ds, b0=b0, k=kb)))
+    # an explicit Morse bond gets the force of its own Morse potential,
+    # which is the force that acted on it in the MD, for both columns
+    mean_f = float(np.mean(bond_forces(ds=ds, params=params, edis=edis, morse=True)))
+    harmonic_f = float(
+        np.mean(bond_forces(ds=ds, params=params, edis=edis, morse=False))
+    )
 
     return {
         "plumed_id": bond_id,
         "mean_d": mean_d,
         "mean_f": mean_f,
-        "delta_d": mean_d - b0,
-        "b0": b0,
+        "delta_d": mean_d - params.b0,
+        "b0": params.b0,
         "harmonic_f": harmonic_f,
     }
 
@@ -426,14 +508,19 @@ def calculate_bondstats_from_trajectory(
         edissoc = None
 
     stats: BondStats = {}
+    sources = Counter()
     for i, bondkey in enumerate(bonds):
+        params = get_bond_parameters(top, bondkey[0], bondkey[1])
+        sources[params.source] += 1
         stats[bondkey] = _stats_for_bond(
             top=top,
             bondkey=bondkey,
             bond_id=f"{bondkey[0]}-{bondkey[1]}",
             ds=distances[:, i],
             edissoc=edissoc,
+            params=params,
         )
+    logger.debug(bond_parameter_summary(sources))
     return stats
 
 
