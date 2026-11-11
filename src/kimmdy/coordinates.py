@@ -1,4 +1,4 @@
-"""coordinate, topology and plumed modification functions"""
+"""coordinate and topology modification functions"""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -14,7 +14,7 @@ import MDAnalysis as mda
 import numpy as np
 
 from kimmdy.constants import FFFUNC
-from kimmdy.parsing import read_plumed, write_plumed
+from kimmdy.parsing import write_top
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import (
@@ -304,17 +304,13 @@ class MoleculeTypeMerger:
         # union topology used for slow growth.
         self._bond_graph_a = self._build_bond_graph(mol_a)
         self._bond_graph_b = self._build_bond_graph(mol_b)
-        # hydroxyl or water H atoms (type HO or HW) whose bonded partners change
-        # in this reaction, i.e. the moving H; used by _get_LJ_parameters.
-        # An H that lands on an oxygen again (product type HO/HW) is left out:
-        # its pairs keep the H1 size in both states, so the push off the donor
-        # oxygen is balanced by the fading push from the acceptor oxygen
-        self.moved_lj_free_hydrogens = {
+        # hydrogens whose bonded partners differ between A and B (the moving H);
+        # in the relax their bonds are Morse bonds with a finite well
+        self.moving_hydrogens = {
             atom_nr
             for atom_nr, atom in mol_a.atoms.items()
-            if atom.type in ("HO", "HW")
+            if self._is_hydrogen(atom)
             and self._bond_graph_a[atom_nr] != self._bond_graph_b.get(atom_nr, set())
-            and mol_b.atoms[atom_nr].type not in ("HO", "HW")
         }
         self._pairs_a = {to_pairkey(key) for key in mol_a.pairs}
         self._pairs_b = {to_pairkey(key) for key in mol_b.pairs}
@@ -359,11 +355,14 @@ class MoleculeTypeMerger:
 
         # after the bonded terms are merged: every interaction that touches a
         # transferred H is written with explicit parameters by then, so the new
-        # type needs no <type>-H1 entry in the force field
+        # type needs no <type>-H entry in the force field
         self._retype_transferred_hydrogens()
+        self._give_moving_hydrogens_lj_in_state_a()
         # optional spring pulling the moving H onto its new atom
         if self.harmonic_acceptor_h_relax_term:
             self._add_harmonic_acceptor_h_terms()
+        # warn before GROMACS runs if a hydrogen still has no LJ core somewhere
+        self._check_hydrogen_lj()
 
         logger.info(f"Finished merging topologies")
 
@@ -553,15 +552,13 @@ class MoleculeTypeMerger:
         id2: str,
         use_state_b: bool,
         is_1_4: bool = False,
-        lj_free_h_in_a: bool = False,
     ):
         """Calculate LJ terms sigma and epsilon from atom types.
 
-        A hydroxyl or water H (type HO or HW) has no LJ size, so it is normally
-        looked up as an H type with a size (H1). With lj_free_h_in_a and
-        retype_transferred_h on, the moving H keeps its real, size-free type in
-        state A instead, so a pair term with it starts at zero and grows in
-        with lambda. Returns sigma and epsilon for the atom pair.
+        A hydrogen whose type has no LJ size (HO or HW in Amber) is looked up
+        as transferred_h_type (H in Amber) instead, in both states, so no pair
+        term or Morse length of the relax starts or ends without a repulsive
+        core. Returns sigma and epsilon for the atom pair.
         """
 
         # defaults top line:
@@ -578,25 +575,12 @@ class MoleculeTypeMerger:
         t1 = mol.atoms[id1].type
         t2 = mol.atoms[id2].type
 
-        # Protect breaking/binding hydrogen types without LJ potential. Keep
-        # the historical H1 lookup when the opt-in relaxation retyping is off.
-        replacement_h_type = (
-            self.transferred_h_type
-            if self.retype_transferred_h and self.transferred_h_type is not None
-            else "H1"
-        )
-        # with retype_transferred_h, the moving H keeps its size-free type in
-        # state A of a pair term, like its atom type in the relax topology
-        keep_real_a_type = (
-            lj_free_h_in_a and self.retype_transferred_h and not use_state_b
-        )
-        if t1 in ["HW", "HO"] and not (
-            keep_real_a_type and id1 in self.moved_lj_free_hydrogens
-        ):
+        # a hydrogen without LJ size gets the small LJ hydrogen type (H in
+        # Amber), whether or not retype_transferred_h is on
+        replacement_h_type = self.transferred_h_type or "H"
+        if self._is_hydrogen(mol.atoms[id1]) and not self._has_lj_size(t1):
             t1 = replacement_h_type
-        if t2 in ["HW", "HO"] and not (
-            keep_real_a_type and id2 in self.moved_lj_free_hydrogens
-        ):
+        if self._is_hydrogen(mol.atoms[id2]) and not self._has_lj_size(t2):
             t2 = replacement_h_type
 
         type1 = self.ff.atomtypes[t1]
@@ -669,9 +653,8 @@ class MoleculeTypeMerger:
         Pair
             Morphing pair
         """
-        # state A: the moving H is size-free here (only pairs, not Morse bond lengths)
         sigmaij_a, epsilonij_a = self._get_LJ_parameters(
-            id1=id1, id2=id2, use_state_b=False, is_1_4=from_1_4, lj_free_h_in_a=True
+            id1=id1, id2=id2, use_state_b=False, is_1_4=from_1_4
         )
         sigmaij_b, epsilonij_b = self._get_LJ_parameters(
             id1=id1, id2=id2, use_state_b=True, is_1_4=to_1_4
@@ -792,29 +775,27 @@ class MoleculeTypeMerger:
         return dihedralmerge
 
     def _find_lj_hydrogen_type(self) -> str | None:
-        """Pick a hydrogen atom type of the force field that has a Lennard-Jones size.
+        """Pick the hydrogen atom type of the force field with the smallest Lennard-Jones size.
 
-        A hydroxyl or water H (type HO or HW) has no size of its own. When such
-        an H moves onto another atom it needs a type with a size; this returns
-        the first one found (H1 in Amber force fields), or None if there is none.
+        A hydroxyl or water H (type HO or HW in Amber) has no LJ size of its
+        own. In the relax it needs one, or it can leave its oxygen and collapse
+        onto a charged atom. This returns the type whose name starts with H
+        and that has the smallest non-zero sigma and epsilon: H in Amber, the
+        polar H on nitrogen (sigma 0.107 nm), which still allows hydrogen
+        bonds. Ties go by name. Returns None if there is no such type.
         """
-        # try the usual names first, then every other type whose name starts with H
-        preferred = ("H1", "H", "HC", "HGA")
-        candidates = list(preferred) + sorted(
-            name for name in self.ff.atomtypes if name not in preferred and name.upper().startswith("H")
-        )
-
-        # return the first candidate with a non-zero size (epsilon)
-        for name in candidates:
-            atomtype = self.ff.atomtypes.get(name)
-            if atomtype is None:
+        candidates = []
+        for name, atomtype in self.ff.atomtypes.items():
+            if not name.upper().startswith("H"):
                 continue
             try:
-                if float(atomtype.epsilon) != 0.0:
-                    return name
-            except (TypeError, ValueError):
+                sigma = float(atomtype.sigma)
+                epsilon = float(atomtype.epsilon)
+            except (AttributeError, TypeError, ValueError):
                 continue
-        return None
+            if sigma > 0.0 and epsilon > 0.0:
+                candidates.append((sigma, name))
+        return min(candidates)[1] if candidates else None
 
     def _add_harmonic_acceptor_h_terms(self):
         """Add a spring between the moving H and its new atom, for the relax only.
@@ -876,14 +857,23 @@ class MoleculeTypeMerger:
         except (TypeError, ValueError):
             return str(atom.type).upper().startswith("H")
 
-    def _retype_transferred_hydrogens(self):
-        """Give a moved hydroxyl or water H a Lennard-Jones size at the end of the relax.
+    def _has_lj_size(self, atom_type: str) -> bool:
+        """Tell whether an atom type has Lennard-Jones parameters (a non-zero epsilon); an unknown type counts as having them."""
+        atomtype = self.ff.atomtypes.get(atom_type)
+        try:
+            return atomtype is None or float(atomtype.epsilon) != 0.0
+        except (TypeError, ValueError):
+            return True
 
-        A hydroxyl or water H (type HO or HW) has no size of its own. This
-        keeps its old type at the start of the relax and sets the type with a
-        size (from _find_lj_hydrogen_type) only for the end state, so the H's
-        size grows in gradually. Only the relax topology is changed. Does
-        nothing when the option is off.
+    def _retype_transferred_hydrogens(self):
+        """Give a moved H whose type in B has no Lennard-Jones size one at the end of the relax.
+
+        State B of the relax uses the atom types of B (merge_atoms). A moved H
+        whose B type has no LJ size (HO or HW in Amber, e.g. an H that lands
+        on an oxygen) gets the type with a size from _find_lj_hydrogen_type
+        (H in Amber) in state B instead. State A is handled by
+        _give_moving_hydrogens_lj_in_state_a. Only the relax topology is
+        changed. Does nothing when the option is off.
         """
         if not self.retype_transferred_h:
             return
@@ -901,11 +891,14 @@ class MoleculeTypeMerger:
             logger.warning("No LJ-bearing hydrogen type found in the force field; skipping transferred-H retyping")
             return
 
-        # retype every hydroxyl or water H among them, in the end state only
+        # retype every H among them whose B type has no LJ size, in the end state only
         retyped = 0
         for atom_nr in candidate_atoms:
             atom = self.mol_a.atoms.get(atom_nr)
-            if atom is None or atom.type not in {"HW", "HO"}:
+            atom_b = self.mol_b.atoms.get(atom_nr)
+            if atom is None or atom_b is None:
+                continue
+            if not self._is_hydrogen(atom_b) or self._has_lj_size(atom_b.type):
                 continue
             implicit = self._implicit_interactions(atom_nr)
             if implicit:
@@ -917,20 +910,130 @@ class MoleculeTypeMerger:
                     self.transferred_h_type,
                 )
                 continue
-            # state B only: state A keeps the original (LJ-free) type, so an H
-            # that sits in a tight hydrogen bond at the reaction frame does not
-            # get its full Lennard-Jones radius at lambda 0 and blow the relax
-            # up; its LJ parameters grow in linearly with lambda instead
+            # state B only here; state A: _give_moving_hydrogens_lj_in_state_a
             atom.typeB = self.transferred_h_type
+            # with typeB but no chargeB, GROMACS takes the B charge from the
+            # atom type (0 in Amber), so write the B charge and mass as well
+            atom.chargeB = atom.chargeB or atom.charge
+            atom.massB = atom.massB or atom.mass
             atom.comment = (
-                f"; transferred H retyped {atom.type} -> "
-                f"{self.transferred_h_type} in state B only"
+                f"; transferred H: B type {atom_b.type} has no LJ size, "
+                f"{self.transferred_h_type} in state B"
             )
             retyped += 1
         if retyped:
             logger.info(
                 "Retyped %d transferred H atom(s) in relaxation topology (state B only)",
                 retyped,
+            )
+
+    def _give_moving_hydrogens_lj_in_state_a(self):
+        """Give a moving H whose type in A has no Lennard-Jones size one at the start of the relax.
+
+        A moving H is a hydrogen whose bonded partners differ between A and B;
+        in the relax its bonds are Morse bonds with a finite well. A hydroxyl
+        or water H (HO or HW in Amber) has no LJ size, so at the start of the
+        relax nothing keeps it off charged atoms once it leaves its oxygen.
+        It gets transferred_h_type (H in Amber, sigma 0.107 nm) in state A,
+        which still allows hydrogen bonds. State B is written out first, so
+        it does not change. Only the relax topology is changed. Does nothing
+        when retype_transferred_h is off.
+        """
+        if not self.retype_transferred_h or self.transferred_h_type is None:
+            return
+
+        retyped = 0
+        for atom_nr in sorted(self.moving_hydrogens, key=int):
+            atom = self.mol_a.atoms[atom_nr]
+            if self._has_lj_size(atom.type):
+                continue
+            implicit = self._implicit_interactions(atom_nr)
+            if implicit:
+                logger.warning(
+                    "Not giving moving H %s an LJ size in state A: %s still take "
+                    "their parameters from the force field by atom type, which "
+                    "has no entry for %s",
+                    atom_nr,
+                    ", ".join(implicit),
+                    self.transferred_h_type,
+                )
+                continue
+            # write state B out before the A type changes, so B stays as it is
+            atom.typeB = atom.typeB or atom.type
+            atom.chargeB = atom.chargeB or atom.charge
+            atom.massB = atom.massB or atom.mass
+            note = (
+                f"moving H: A type {atom.type} has no LJ size, "
+                f"{self.transferred_h_type} in state A"
+            )
+            atom.comment = f"{atom.comment}; {note}" if atom.comment else f"; {note}"
+            atom.type = self.transferred_h_type
+            retyped += 1
+        if retyped:
+            logger.info(
+                "Gave %d moving H atom(s) an LJ size in state A of the relaxation topology",
+                retyped,
+            )
+
+    def _check_hydrogen_lj(self):
+        """Warn if a hydrogen would have no Lennard-Jones core somewhere in the relax.
+
+        Checks the merged topology for two things:
+        - every moving H has an atom type with an LJ size in state A and B
+        - every explicit pair with a hydrogen has a non-zero epsilon in each
+          state where its two atoms are not excluded from each other
+        Without an LJ core a charged H can collapse onto an atom of opposite
+        charge (the Coulomb energy goes to minus infinity) and the relax can
+        blow up, so this logs a warning that lists the problems.
+        """
+        problems: list[str] = []
+        for atom_nr in sorted(self.moving_hydrogens, key=int):
+            atom = self.mol_a.atoms[atom_nr]
+            for state, atom_type in (("A", atom.type), ("B", atom.typeB or atom.type)):
+                if not self._has_lj_size(atom_type):
+                    problems.append(
+                        f"moving H {atom_nr} has type {atom_type} without LJ size "
+                        f"in state {state}"
+                    )
+
+        endpoints = {
+            "A": (
+                self._bond_graph_a,
+                self._pairs_a,
+                self._explicit_exclusions_a,
+                self._nrexcl(self.mol_a),
+            ),
+            "B": (
+                self._bond_graph_b,
+                self._pairs_b,
+                self._explicit_exclusions_b,
+                self._nrexcl(self.mol_b),
+            ),
+        }
+        for key, pair in self.mol_a.pairs.items():
+            # a pair without numbers takes them from the atom types
+            if not is_parameterized(pair):
+                continue
+            if not any(self._is_hydrogen(self.mol_a.atoms[nr]) for nr in key):
+                continue
+            pair_key = to_pairkey(key)
+            # GROMACS uses the A numbers for B when B has none
+            epsilons = {"A": pair.c1, "B": pair.c3 if pair.c3 is not None else pair.c1}
+            for state, epsilon in epsilons.items():
+                if float(epsilon) != 0.0:
+                    continue
+                if self._nonbonded_state(pair_key, *endpoints[state]) != NonbondedState.Excluded:
+                    problems.append(
+                        f"pair {'-'.join(pair_key)} has no LJ in state {state}, "
+                        "where its atoms are not excluded"
+                    )
+
+        if problems:
+            logger.warning(
+                "The slow-growth topology leaves hydrogens without a Lennard-Jones "
+                "core, which lets them collapse onto charged atoms in the relax: "
+                + "; ".join(problems)
+                + ". Is changer.coordinates.retype_transferred_h on?"
             )
 
     def _implicit_interactions(self, atom_nr: str) -> list[str]:
@@ -982,14 +1085,14 @@ class MoleculeTypeMerger:
         for nr in self.mol_a.atoms.keys():
             atomA = self.mol_a.atoms[nr]
             atomB = self.mol_b.atoms[nr]
-            if atomA != atomB and not (
-                self.morse_only and atomA.charge == atomB.charge
-            ):
-                # the simplified version doesn't change if the charges are the same
-                # set B parameters first
-                # to not overwrite them
-                # keep the name of the atom
-                # but transition the type, charge and mass
+            # the relaxation uses the charges of B in both states: interpolated
+            # charges make atoms perturbed, and GROMACS does not support
+            # perturbed, excluded pairs beyond the pair-list cut-off, such as
+            # the atoms of a broken bond that separate during the relaxation
+            atomA.charge = deepcopy(atomB.charge)
+            if atomA != atomB:
+                # in both modes (full and morse_only): keep the name of the
+                # atom, but transition the type and mass to those of B
                 atomA.typeB = deepcopy(atomB.type)
                 atomA.chargeB = deepcopy(atomB.charge)
                 atomA.massB = deepcopy(atomB.mass)
@@ -1820,6 +1923,55 @@ class MoleculeTypeMerger:
             )
 
 
+def add_reacting_water_bonds(
+    top_a: Topology, reaction_atom_nrs: set[str], out_path: Optional[Path] = None
+) -> None:
+    """Give a reacting water in A temporary O-H bonds for the start of the slow growth.
+
+    A water held rigid by SETTLES has no bonds that could fade out. If OW,
+    HW1 and HW2 of a water are among the reaction atoms, they get bonds (and
+    the angle) with force-field parameters instead. top_a is modified in place.
+    If bonds were added and out_path is given, top_a with them is written
+    there for debugging.
+    """
+    solvent_atoms: set[str] = set()
+    logger.debug(f"Checking for reacting solvent residues..")
+    for ai in reaction_atom_nrs:
+        if top_a.atoms[ai].residue == "SOL":
+            solvent_atoms.add(ai)
+            logger.debug(f"Reacting solvent atom: {top_a.atoms[ai]}")
+    if len(solvent_atoms) == 0:
+        return
+    logger.info(
+        f"{len(solvent_atoms)} solvent atoms are involved "
+        "in the reaction, they will get temporary bonds for "
+        "the start of the slow growth simulation."
+    )
+    ow = None
+    hw1 = None
+    hw2 = None
+    for ai in solvent_atoms:
+        a = top_a.atoms[ai]
+        if a.atom == "OW":
+            ow = a
+        if a.atom == "HW1":
+            hw1 = a
+        if a.atom == "HW2":
+            hw2 = a
+    if ow is not None and hw1 is not None and hw2 is not None:
+        logger.info("Found one complete water molecule that takes part in the reaction.")
+        top_a.bind_bond((ow.nr, hw1.nr))
+        top_a.bind_bond((ow.nr, hw2.nr))
+        # the temporary bonds keep their force-field parameters,
+        # writing this topology must not parameterize it
+        top_a.needs_parameterization = False
+        b1 = top_a.bonds.get((ow.nr, hw1.nr))
+        b2 = top_a.bonds.get((ow.nr, hw2.nr))
+        logger.info(f"Added bonds: {b1}, {b2}")
+        if out_path is not None:
+            write_top(top_a.to_dict(), out_path)
+
+
 def merge_top_slow_growth(
     top_a: Topology,
     top_b: Topology,
@@ -1833,6 +1985,8 @@ def merge_top_slow_growth(
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
     All changes are contained to the `Reactive` moleculetype.
+    The relaxation uses the charges of B in both states; atom types, masses
+    and bonded terms are interpolated.
     """
 
     MoleculeTypeMerger(
@@ -1855,46 +2009,3 @@ def merge_top_slow_growth(
     top_a._link_atomics()
 
     return
-
-
-def break_bond_plumed(
-    files: TaskFiles, breakpair: tuple[str, str], newplumed: Path
-) -> None:
-    """Break bond in plumed configuration file.
-
-    Parameters
-    ----------
-    files:
-
-    breakpair:
-    """
-
-    plumed_path = files.input["plumed"]
-    # if break_bond_plumed is called multiple times in one _apply_recipe task
-    if "plumed" in files.output.keys():
-        plumed_path = files.output["plumed"]
-    assert plumed_path is not None, "plumed_path should not be None"
-    plumed_dict = read_plumed(plumed_path)
-
-    files.output["plumed"] = newplumed
-
-    logger.debug(
-        f"Reading: {files.input['plumed']} and writing modified plumed input to "
-        f"{files.output['plumed']}."
-    )
-
-    new_distances = {}
-    broken_distances = []
-    for k, v in plumed_dict["labeled_action"].items():
-        if all(x in v["atoms"] for x in breakpair):
-            broken_distances.append(k)
-        else:
-            new_distances[k] = v
-
-    plumed_dict["labeled_action"] = new_distances
-
-    for line in plumed_dict["prints"]:
-        line["ARG"] = [id for id in line["ARG"] if id not in broken_distances]
-        line["FILE"] = files.input["plumed_out"]
-
-    write_plumed(plumed_dict, newplumed)

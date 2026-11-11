@@ -3,7 +3,7 @@ import textwrap
 from copy import copy, deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Collection, Optional, Union
 
 from kimmdy.constants import (
     ATOM_ID_FIELDS,
@@ -14,7 +14,7 @@ from kimmdy.constants import (
 )
 from kimmdy.parsing import TopologyDict, empty_section, read_top, write_top
 from kimmdy.plugins import BasicParameterizer, Parameterizer
-from kimmdy.recipe import Bind, Break, RecipeStep
+from kimmdy.recipe import RecipeStep
 from kimmdy.topology.atomic import (
     Angle,
     AngleType,
@@ -32,17 +32,20 @@ from kimmdy.topology.atomic import (
     PositionRestraint,
     ResidueImproperSpec,
     combine_periodic_terms,
-    ResidueType,
     Settle,
 )
+from kimmdy.topology.charges import (
+    DEFAULT_TEMPLATE_TOLERANCE,
+    assign_recipe_charges,
+    check_charge_conservation,
+)
 from kimmdy.topology.ff import FF
-from kimmdy.topology.product_templates import ProductTemplateMatch
+from kimmdy.topology.templates import assign_recipe_names, is_hydrogen
 from kimmdy.topology.utils import (
     attributes_to_list,
     get_moleculetype_atomics,
     get_moleculetype_header,
     get_residue_by_bonding,
-    get_residue_fragments,
     get_top_section,
     increment_field,
     is_not_solvent_or_ion,
@@ -58,7 +61,6 @@ logger = logging.getLogger("kimmdy.topology")
 class ParameterizationReport:
     event_focus_ids: set[str]
     active_radical_ids: set[str]
-    restored_templates: int
 
 
 class MoleculeType:
@@ -85,6 +87,7 @@ class MoleculeType:
         atomics: dict,
         radicals: Optional[str] = None,
         repeated_lines: str = "merge",
+        ff: Optional[FF] = None,
     ) -> None:
         # what to do with repeated topology lines: merge, error or last
         # (changer.topology.repeated_topology_lines)
@@ -136,7 +139,7 @@ class MoleculeType:
                             "config file not in topology. Ignoring this entry."
                         )
         else:
-            self.find_radicals()
+            self.find_radicals(ff)
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -351,11 +354,17 @@ class MoleculeType:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def find_radicals(self):
+    def find_radicals(self, ff: Optional[FF] = None):
         """Find atoms that are radicals and update self.radicals.
 
         Iterate over all atoms and designate them as radicals if they have
-        fewer bounds than their natural bond order.
+        fewer bonds than the smallest natural bond order of their atom type.
+        Atom types can have several natural bond orders
+        (see ATOMTYPE_BONDORDER_FLAT), e.g. N3 with 3 or 4 bonds. An atom
+        with fewer bonds than the largest, e.g. an N3 with 3 bonds (a neutral
+        amine or an NH3+ that lost a hydrogen), is a radical if the rtp entry
+        of its residue makes it one (TemplateLibrary.radical_by_template),
+        given ff. Without ff, or without an entry that fits, it is not.
         """
         logger.debug(
             "Trying to infer radical status based on AMBER(!!) atomtype bond "
@@ -363,20 +372,43 @@ class MoleculeType:
         )
         self.radicals = {}
         error_atoms = set()
+        unexpected_bonds = set()
+        # atoms whose number of bonds fits several states, decided by templates
+        ambiguous = []
         for atom in self.atoms.values():
-            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
-            if bo is None:
+            bond_orders = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            if bond_orders is None:
                 error_atoms.add(atom.type)
-            if bo and bo > len(atom.bound_to_nrs):
+                atom.is_radical = False
+                continue
+            n_bonds = len(atom.bound_to_nrs)
+            if n_bonds < min(bond_orders):
                 self.radicals[atom.nr] = atom
                 atom.is_radical = True
             else:
                 atom.is_radical = False
+                if n_bonds not in bond_orders:
+                    unexpected_bonds.add((atom.type, n_bonds))
+                elif 0 not in bond_orders and n_bonds < max(bond_orders):
+                    ambiguous.append(atom)
+        if ff is not None:
+            for atom in ambiguous:
+                if ff.templates.radical_by_template(self.atoms, atom):
+                    self.radicals[atom.nr] = atom
+                    atom.is_radical = True
         if len(error_atoms) > 0:
             logger.warning(
                 "Some atomtypes not found in AMBER atomtypes. Cannot infer radical status.\n"
                 "Missing atom types:\n"
                 f"{error_atoms}"
+            )
+        if len(unexpected_bonds) > 0:
+            logger.warning(
+                f"Some atoms in molecule {self.name} have a number of bonds "
+                "that does not match the bond orders of their atom type. "
+                "They are not treated as radicals.\n"
+                "(atom type, number of bonds):\n"
+                f"{sorted(unexpected_bonds)}"
             )
         return None
 
@@ -515,116 +547,123 @@ class MoleculeType:
                         dihedrals.append(key)
         return dihedrals
 
-    def _get_atom_improper_dihedrals(
-        self, atom_nr: str, ff: FF
-    ) -> dict[ImproperDihedralId, list[ResidueImproperSpec]]:
-        """Find the residue-template impropers that contain one atom, with real atom numbers.
+    def _get_residue_improper_dihedrals(
+        self, residue: dict[str, Atom], ff: FF
+    ) -> Optional[dict[ImproperDihedralId, list[ResidueImproperSpec]]]:
+        """The improper dihedrals of a residue's rtp entry, with atom numbers.
 
-        Looks up the atom's residue template, translates the template's atom
-        names (including -C, the previous residue's C, and +N, the next
-        residue's N) into atom numbers, and returns every improper term that
-        contains the atom: {four atom numbers: list of terms, one per
-        periodicity}.
+        The residue is matched to its rtp entry by its atoms and bonds
+        (TemplateLibrary.rtp_template). The entry's atom names are
+        translated into atom numbers; -X and +X are atoms of the previous
+        and next residue, found through bonds (_get_neighbor_residue_atoms).
+        Returns {four atom numbers: list of terms, one per periodicity},
+        without the entry's impropers whose atoms are not all there (e.g. an
+        abstracted hydrogen, or -C at the N-terminus). None if no rtp entry
+        matches.
         <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         """
+        template = ff.templates.rtp_template(residue)
+        residuetype = None if template is None else ff.residuetypes.get(template.name)
+        if residuetype is None:
+            return None
 
-        atom = self.atoms[atom_nr]
-        residuetype = ff.residuetypes.get(atom.residue)
-        if not isinstance(residuetype, ResidueType):
-            return {}
-
-        # find the previous and next residue (needed for -C and +N)
-        residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
+        # atom numbers by atom name in this residue (""), the previous ("-")
+        # and the next ("+") residue
         previous_atom, next_atom = self._get_neighbor_residue_atoms(residue)
-        if previous_atom is not None:
-            previous_residue = get_residue_by_bonding(
-                atom=previous_atom, atoms=self.atoms
+        residues = {
+            "": residue,
+            "-": {}
+            if previous_atom is None
+            else get_residue_by_bonding(previous_atom, self.atoms),
+            "+": {} if next_atom is None else get_residue_by_bonding(next_atom, self.atoms),
+        }
+        numbers = {
+            prefix: {atom.atom: nr for nr, atom in atoms.items()}
+            for prefix, atoms in residues.items()
+        }
+
+        impropers: dict[ImproperDihedralId, list[ResidueImproperSpec]] = {}
+        for names, specs in residuetype.improper_dihedrals.items():
+            key = tuple(
+                numbers[name[0] if name[0] in "+-" else ""].get(name.lstrip("+-"))
+                for name in names
             )
-            previous_residuetype = ff.residuetypes.get(previous_atom.residue)
-        else:
-            previous_residue = {}
-            previous_residuetype = None
-        if next_atom is not None:
-            next_residue = get_residue_by_bonding(atom=next_atom, atoms=self.atoms)
-            next_residuetype = ff.residuetypes.get(next_atom.residue)
-        else:
-            next_residue = {}
-            next_residuetype = None
+            if None in key:
+                continue  # an atom of the entry is not there
+            # gromacs sorts the keys such that the first atom is the lowest numbered
+            if int(key[0]) > int(key[3]):  # pyright: ignore
+                key = key[::-1]
+                specs = [spec.reversed() for spec in specs]
+            impropers[key] = list(specs)  # pyright: ignore
+        return impropers
 
-        atomname_to_nr = {atom.atom: atom_nr for atom_nr, atom in residue.items()}
-        # residues on aminoacids.rtp specify a dihedral to the next or previous
-        # AA with -C and +N as the atomname
-        prev_atomname_to_nr = {
-            atom.atom: atom_nr for atom_nr, atom in previous_residue.items()
-        }
-        next_atomname_to_nr = {
-            atom.atom: atom_nr for atom_nr, atom in next_residue.items()
-        }
+    def _set_improper_dihedrals(
+        self, impropers: dict[ImproperDihedralId, list[ResidueImproperSpec]]
+    ) -> None:
+        """Write rtp improper terms into the topology, every term (one per periodicity), replacing those of the same atoms."""
+        funct = FFFUNC["mult_improper_dihedral"]
+        for key, specs in impropers.items():
+            dihedrals = {}
+            for spec in specs:
+                periodicity = "" if spec.c2 is None else spec.c2
+                dihedrals[periodicity] = Dihedral(
+                    *key, funct, c0=spec.c0, c1=spec.c1, periodicity=periodicity
+                )
+            self.improper_dihedrals[key] = MultipleDihedrals(
+                *key, funct, dihedrals=dihedrals
+            )
 
-        dihedrals: dict[ImproperDihedralId, list[ResidueImproperSpec]] = {}
-        if previous_residuetype is not None and atom.atom == "N":
-            # the atom is N, so it may have an improper defined
-            # in the previous residue, where it would be referred to as +N
-            for key, impropers in previous_residuetype.improper_dihedrals.items():
-                # find the dihedral with +N
-                if any(["+" in k for k in key]):
-                    nr_key: ImproperDihedralId = tuple(
-                        atom.nr if "+" in x else prev_atomname_to_nr.get(x) for x in key
-                    )  # pyright: ignore
-                    if None in nr_key:
-                        m = f"Improper dihedral {key} with {nr_key} not found in residue {atom.residue}."
-                        logger.debug(m)
-                        continue
-                    dihedrals[nr_key] = impropers
+    @staticmethod
+    def _residue_is_connected(residue: dict[str, Atom]) -> bool:
+        """Whether all atoms of a residue are connected by bonds between them."""
+        start = next(iter(residue))
+        seen = {start}
+        todo = [start]
+        while todo:
+            for nr in residue[todo.pop()].bound_to_nrs:
+                if nr in residue and nr not in seen:
+                    seen.add(nr)
+                    todo.append(nr)
+        return len(seen) == len(residue)
 
-        if next_residuetype is not None and atom.atom == "C":
-            # the atom is C, so it may have an improper defined
-            # in the previous residue, where it would be referred to as -C
-            for key, impropers in next_residuetype.improper_dihedrals.items():
-                # find the dihedral with -C
-                if any(["-" in k for k in key]):
-                    nr_key = tuple(
-                        atom.nr if "-" in x else next_atomname_to_nr.get(x) for x in key
-                    )  # pyright: ignore
-                    if None in nr_key:
-                        m = f"Improper dihedral {key} with {nr_key} not found in residue {atom.residue}."
-                        logger.debug(m)
-                        continue
-                    dihedrals[nr_key] = impropers
+    def update_residue_impropers(
+        self, residues: Collection[dict[str, Atom]], ff: FF
+    ) -> None:
+        """Set the improper dihedrals of whole residues again from their rtp entries.
 
-        def get_number(name):
-            """Get the atom number for an atom name from a dihedral specification"""
-            if "+" in name:
-                # + refers to the next residue
-                return next_atomname_to_nr.get(name.replace("+", ""), None)
-            elif "-" in name:
-                # - refers to the previous residue
-                return prev_atomname_to_nr.get(name.replace("-", ""), None)
-            else:
-                # regular atom name
-                return atomname_to_nr.get(name, None)
+        A residue owns an improper if all its atoms are in the residue, or
+        all but one and that one is the atom through which the residue is
+        bonded to its previous or next residue (_get_neighbor_residue_atoms;
+        for proteins the C of the previous and the N of the next residue).
+        The impropers a residue owns are replaced by those of its rtp entry
+        (_get_residue_improper_dihedrals). Bonds need no check here: the
+        entry is matched by the atoms and the bonds inside the residue, and
+        the neighbors are found through bonds.
 
-        # regularly defined improper dihedrals of the same residue
-        for key, impropers in residuetype.improper_dihedrals.items():
-            nr_key = tuple(get_number(x) for x in key)  # pyright: ignore
-            if atom_nr not in nr_key:
+        Impropers with more than one atom outside the residue (e.g. of a
+        crosslink) are never touched. A residue whose atoms are no longer
+        connected (split by a broken bond) keeps its impropers; break_bond
+        already removed those across the bond. A residue that matches no rtp
+        entry keeps its impropers too, with a warning.
+        """
+        for residue in residues:
+            if not residue or not self._residue_is_connected(residue):
                 continue
-            if None in nr_key:
-                m = f"Improper dihedral {key} {nr_key} not found in residue {atom.residue}."
-                logger.debug(m)
+            impropers = self._get_residue_improper_dihedrals(residue, ff)
+            if impropers is None:
+                atom = next(iter(residue.values()))
+                logger.warning(
+                    f"No rtp entry matches residue {atom.residue} {atom.resnr}; "
+                    "its improper dihedrals are kept."
+                )
                 continue
-            dihedrals[nr_key] = impropers
-
-        # gromacs sorts the keys such that the first atom is the lowest numbered
-        new_dihedrals: dict[ImproperDihedralId, list[ResidueImproperSpec]] = {}
-        for key, impropers in dihedrals.items():
-            if int(key[0]) > int(key[3]):
-                key = (key[3], key[2], key[1], key[0])
-                new_dihedrals[key] = [improper.reversed() for improper in impropers]
-            else:
-                new_dihedrals[key] = list(impropers)
-
-        return new_dihedrals
+            previous_atom, next_atom = self._get_neighbor_residue_atoms(residue)
+            boundary = {a.nr for a in (previous_atom, next_atom) if a is not None}
+            for key in list(self.improper_dihedrals):
+                outside = [nr for nr in key if nr not in residue]
+                if not outside or (len(outside) == 1 and outside[0] in boundary):
+                    self.improper_dihedrals.pop(key)
+            self._set_improper_dihedrals(impropers)
 
     def _get_neighbor_residue_atoms(
         self, residue: dict[str, Atom]
@@ -708,24 +747,19 @@ class MoleculeType:
         # pdb2gmx applies its terminus rules (.n.tdb/.c.tdb) and, for example,
         # writes no a99SB-disp psi correction (N CA C +N) for the N-terminal
         # residue, so a rebuild there adds a psi term pdb2gmx does not have.
+        # This does not seem to be a problem for Amber ff99SB-type force
+        # fields (e.g. amber99sb-star-ildnp, a99SB-disp): their .tdb files
+        # are empty and the termini are separate rtp entries (N<res>, C<res>),
+        # which rtp_template picks by atoms and bonds.
+        done: set[str] = set()
         for atom in self.atoms.values():
-            impropers = self._get_atom_improper_dihedrals(atom.nr, ff)
-            for key, specs in impropers.items():
-                dihedrals = {}
-                for improper in specs:
-                    periodicity = "" if improper.c2 is None else improper.c2
-                    dihedrals[periodicity] = Dihedral(
-                        *key,
-                        FFFUNC["mult_improper_dihedral"],
-                        c0=improper.c0,
-                        c1=improper.c1,
-                        periodicity=periodicity,
-                    )
-                self.improper_dihedrals[key] = MultipleDihedrals(
-                    *key,
-                    FFFUNC["mult_improper_dihedral"],
-                    dihedrals=dihedrals,
-                )
+            if atom.nr in done:
+                continue
+            residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
+            done.update(residue)
+            self._set_improper_dihedrals(
+                self._get_residue_improper_dihedrals(residue, ff) or {}
+            )
 
     def reindex_atomnrs(self) -> dict[str, str]:
         """Reindex atom numbers in topology.
@@ -938,7 +972,6 @@ class Topology:
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
         repeated_topology_lines: str = "merge",
-        conserve_transferred_h_charge: bool = False,
     ):
         """Topology options (changer.topology in kimmdy.yml):
 
@@ -949,13 +982,6 @@ class Topology:
             shifted by a constant) and warns, and stops on any other repeat;
             "error" stops on any repeat; "last" keeps only the last line, as
             older KIMMDY did. #define names are replaced first in every mode.
-        conserve_transferred_h_charge
-            Opt-in local charge balancing; defaults to False. When enabled,
-            a transferred H keeps its charge and the acceptor gives up the
-            same amount. This bypasses template charge assignment and complete
-            exact-ITP product restoration, including atom types, masses and
-            queued bonded parameters. When disabled, retain template restoration
-            and the existing fallback when no suitable charge template exists.
         """
         if repeated_topology_lines not in ("merge", "error", "last"):
             raise ValueError(
@@ -983,14 +1009,6 @@ class Topology:
             product_template_transitions=product_template_transitions,
             repeated_topology_lines=repeated_topology_lines,
         )
-        self.pending_product_template_matches: dict[
-            tuple[str, str], ProductTemplateMatch
-        ] = {}
-        self.pending_transferred_h_charges: dict[str, str] = {}
-        self.conserve_transferred_h_charge = conserve_transferred_h_charge
-        self.pending_product_template_restorations: list[
-            ProductTemplateMatch
-        ] = []
         # #define names first, so periodicities are known whatever the mode
         self._expand_parameter_macros()
         self._parse_molecules()
@@ -1118,6 +1136,7 @@ class Topology:
             reactive_atomics,
             radicals,
             repeated_lines=self.repeated_topology_lines,
+            ff=self.ff,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -1321,458 +1340,117 @@ class Topology:
         )
         self.parametrizer.parameterize_topology(self, focus_nrs=focus_ids)
 
-    def update_parameters(self):
-        if self.needs_parameterization:
-            self._parameterize_focus(set(self.parameterization_focus_ids))
-            self.needs_parameterization = False
+    def update_bonded(self) -> ParameterizationReport:
+        """Parameterize the bonded interactions around the focus atoms, if the topology changed.
 
-    def prepare_product_parameters(self) -> ParameterizationReport:
-        """Prepare topology B and retain only still-active radical focus IDs."""
-        event_focus_ids = set(self.parameterization_focus_ids)
-        if self.needs_parameterization:
-            self._parameterize_focus(event_focus_ids)
-
-        restored_templates = self.restore_pending_product_templates()
-        active_radical_ids = set(self.radicals)
-        if restored_templates and active_radical_ids:
-            # Active radical regions own overlapping interactions.
-            self._parameterize_focus(active_radical_ids)
-
-        # TODO: Restore exact classical RTP bonded templates before compacting
-        # focus IDs; RTP products currently retain their final Grappa terms.
-        self.parameterization_focus_ids = active_radical_ids
-        self.needs_parameterization = False
-        return ParameterizationReport(
-            event_focus_ids=event_focus_ids,
-            active_radical_ids=active_radical_ids,
-            restored_templates=restored_templates,
-        )
-
-    def restore_pending_product_templates(self) -> int:
-        """Restore exact single-residue ITP products after Grappa parameterization."""
-        restored = 0
-        pending = self.pending_product_template_restorations
-        self.pending_product_template_restorations = []
-        for match in pending:
-            if not match.template.supports_bonded_restoration:
-                logger.info(
-                    "ITP template %s:%s spans multiple residues; retaining "
-                    "Grappa bonded parameters.",
-                    match.template.moleculetype,
-                    match.template.local_resnr,
-                )
-                continue
-            self._restore_product_template_interactions(match)
-            restored += 1
-        return restored
-
-    def _restore_product_template_interactions(
-        self, match: ProductTemplateMatch
-    ) -> None:
-        template = match.template
-        mapped_ids = set(match.local_to_global.values())
-
-        bonds = [
-            self._resolve_template_bond(match, line)
-            for line in template.bond_lines
-        ]
-        pairs = [self._map_template_pair(match, line) for line in template.pair_lines]
-        angles = [
-            self._resolve_template_angle(match, line) for line in template.angle_lines
-        ]
-        proper_dihedrals, improper_dihedrals = self._resolve_template_dihedrals(
-            match
-        )
-
-        for key in list(self.bonds):
-            if set(key) <= mapped_ids:
-                self.bonds.pop(key)
-        self.bonds.update({(bond.ai, bond.aj): bond for bond in bonds})
-
-        for key in list(self.pairs):
-            if set(key) <= mapped_ids:
-                self.pairs.pop(key)
-        self.pairs.update({(pair.ai, pair.aj): pair for pair in pairs})
-
-        for key in list(self.angles):
-            if set(key) <= mapped_ids:
-                self.angles.pop(key)
-        self.angles.update(
-            {(angle.ai, angle.aj, angle.ak): angle for angle in angles}
-        )
-
-        for key, interaction in list(self.proper_dihedrals.items()):
-            if (
-                set(key) <= mapped_ids
-                and interaction.funct == FFFUNC["mult_proper_dihedral"]
-            ):
-                self.proper_dihedrals.pop(key)
-        self.proper_dihedrals.update(proper_dihedrals)
-
-        # Only replace periodic impropers KIMMDY can interpolate safely. CHARMM
-        # harmonic function-2 impropers remain under Grappa ownership for now.
-        for key in improper_dihedrals:
-            self.improper_dihedrals.pop(key, None)
-        self.improper_dihedrals.update(improper_dihedrals)
-
-        logger.info(
-            "Restored bonded parameters from exact ITP product template %s:%s "
-            "(%d bonds, %d pairs, %d angles, %d proper and %d improper dihedrals).",
-            template.moleculetype,
-            template.local_resnr,
-            len(bonds),
-            len(pairs),
-            len(angles),
-            len(proper_dihedrals),
-            len(improper_dihedrals),
-        )
-
-    def _mapped_template_line(
-        self,
-        match: ProductTemplateMatch,
-        line: tuple[str, ...],
-        atom_count: int,
-    ) -> list[str]:
-        mapped = list(line)
-        try:
-            mapped[:atom_count] = [
-                match.local_to_global[atom_nr] for atom_nr in line[:atom_count]
-            ]
-        except KeyError as error:
-            raise RuntimeError(
-                "Exact ITP product-template interaction references an unmapped "
-                f"atom {error.args[0]!r} in {match.template.source}."
-            ) from error
-        return mapped
-
-    def _resolve_template_bond(
-        self, match: ProductTemplateMatch, line: tuple[str, ...]
-    ) -> Bond:
-        mapped = self._mapped_template_line(match, line, 2)
-        key = tuple(sorted(mapped[:2], key=int))
-        bond = Bond.from_top_line([*key, *mapped[2:]])
-        if bond.c0 is not None and bond.c1 is not None:
-            return bond
-        atom_types = [self.atoms[atom_nr].type for atom_nr in key]
-        bond_type = match_atomic_item_to_atomic_type(atom_types, self.ff.bondtypes)
-        if not isinstance(bond_type, BondType):
-            raise ValueError(
-                f"Could not resolve ITP bond parameters for {atom_types} in "
-                f"{match.template.source}."
-            )
-        return Bond(*key, funct=bond_type.funct, c0=bond_type.c0, c1=bond_type.c1)
-
-    def _map_template_pair(
-        self, match: ProductTemplateMatch, line: tuple[str, ...]
-    ) -> Pair:
-        mapped = self._mapped_template_line(match, line, 2)
-        key = tuple(sorted(mapped[:2], key=int))
-        return Pair.from_top_line([*key, *mapped[2:]])
-
-    def _resolve_template_angle(
-        self, match: ProductTemplateMatch, line: tuple[str, ...]
-    ) -> Angle:
-        mapped = self._mapped_template_line(match, line, 3)
-        if int(mapped[0]) > int(mapped[2]):
-            mapped[0], mapped[2] = mapped[2], mapped[0]
-        angle = Angle.from_top_line(mapped)
-        if angle.c0 is not None and angle.c1 is not None:
-            return angle
-        key = (angle.ai, angle.aj, angle.ak)
-        atom_types = [self.atoms[atom_nr].type for atom_nr in key]
-        angle_type = match_atomic_item_to_atomic_type(atom_types, self.ff.angletypes)
-        if not isinstance(angle_type, AngleType):
-            raise ValueError(
-                f"Could not resolve ITP angle parameters for {atom_types} in "
-                f"{match.template.source}."
-            )
-        return Angle(
-            *key,
-            funct=angle_type.funct,
-            c0=angle_type.c0,
-            c1=angle_type.c1,
-            c2=angle_type.c2,
-            c3=angle_type.c3,
-        )
-
-    def _resolve_template_dihedrals(
-        self, match: ProductTemplateMatch
-    ) -> tuple[
-        dict[tuple[str, str, str, str], MultipleDihedrals],
-        dict[tuple[str, str, str, str], MultipleDihedrals],
-    ]:
-        proper: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
-        improper: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
-        unsupported_functions: set[str] = set()
-
-        for line in match.template.dihedral_lines:
-            mapped = self._mapped_template_line(match, line, 4)
-            funct = mapped[4]
-            if funct not in {
-                FFFUNC["mult_proper_dihedral"],
-                FFFUNC["mult_improper_dihedral"],
-            }:
-                unsupported_functions.add(funct)
-                continue
-            if (
-                funct == FFFUNC["mult_proper_dihedral"]
-                and int(mapped[1]) > int(mapped[2])
-            ):
-                mapped[:4] = reversed(mapped[:4])
-
-            dihedral = Dihedral.from_top_line(mapped)
-            key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            target = proper if funct == FFFUNC["mult_proper_dihedral"] else improper
-            types = (
-                self.ff.proper_dihedraltypes
-                if target is proper
-                else self.ff.improper_dihedraltypes
-            )
-
-            resolved: list[Dihedral] = []
-            if dihedral.c0 is not None and dihedral.c1 is not None:
-                resolved.append(dihedral)
-            else:
-                atom_types = [self.atoms[atom_nr].type for atom_nr in key]
-                for periodicity in map(str, range(1, 7)):
-                    dihedral_type = match_atomic_item_to_atomic_type(
-                        atom_types, types, periodicity
-                    )
-                    if isinstance(dihedral_type, DihedralType):
-                        resolved.append(
-                            Dihedral(
-                                *key,
-                                funct=funct,
-                                c0=dihedral_type.c0,
-                                c1=dihedral_type.c1,
-                                periodicity=dihedral_type.periodicity,
-                            )
-                        )
-
-            if not resolved:
-                raise ValueError(
-                    "Could not resolve ITP dihedral parameters for "
-                    f"{[self.atoms[atom_nr].type for atom_nr in key]} in "
-                    f"{match.template.source}."
-                )
-            multiple = target.setdefault(
-                key, MultipleDihedrals(*key, funct=funct, dihedrals={})
-            )
-            for item in resolved:
-                multiple.dihedrals[item.periodicity] = item
-
-        if unsupported_functions:
-            logger.warning(
-                "ITP template %s contains unsupported dihedral functions %s; "
-                "retaining Grappa parameters for those interactions.",
-                match.template.source,
-                sorted(unsupported_functions),
-            )
-        return proper, improper
-
-    def update_partial_charges(self, recipe_steps: list[RecipeStep]) -> None:
-        """Update the topology atom partial charges.
-
-        Calls must reflect the topology state represented by their steps. A
-        standalone Break can be processed after the recipe, preserving legacy
-        slow-growth behavior. A Break associated with a later Bind must be
-        processed before ``bind_bond()`` changes the shared atom's residue;
-        that Bind is then processed afterward, when product-template
-        information is available.
-
-        Update rules follow a simple assignment scheme that works well with
-        grappa. If fragments are created, their partial charges are kept
-        integers. If previously broken bonds are formed again, the original
-        partial charges are restored.
-        If no product template matches a transferred H, its original charge
-        is restored and balanced locally by the acceptor atom. With
-        ``conserve_transferred_h_charge`` this local balancing is used for
-        every transferred H, so templates only provide names and atom types.
+        Returns the atoms in focus and the radicals. Charges and atom types
+        must be final before, because the parameterizer may use them
+        (update_nonbonded).
         """
+        focus_ids = set(self.parameterization_focus_ids)
+        if self.needs_parameterization:
+            self._parameterize_focus(focus_ids)
+            self.needs_parameterization = False
+        return ParameterizationReport(
+            event_focus_ids=focus_ids,
+            active_radical_ids=set(self.radicals),
+        )
 
-        # build updated list of atoms by residue for topology so that this does
-        # not need to be repeated
-        # Warning: resnr not unique for each residue, 'residues' can map to
-        # more than one real residue
-        residues = {}
-        for atom in self.atoms.values():
-            if residues.get(atom.resnr) is None:
-                residues[atom.resnr] = []
-            residues[atom.resnr].append(atom)
+    def update_parameters(self) -> ParameterizationReport:
+        """Deprecated name of update_bonded."""
+        return self.update_bonded()
 
-        for step in recipe_steps:
-            if isinstance(step, Break):
-                # make partial charges on either side of the break integer
-                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
-                    atom1 = self.atoms[step.atom_id_1]
-                    atom2 = self.atoms[step.atom_id_2]
-                    fragment1, fragment2 = get_residue_fragments(
-                        self, residues[atom1.resnr], atom1, atom2
-                    )
-                    if len(fragment2) in (0, 1):
-                        # intra-residue HAT case (or similar)
-                        if atom1.type.upper().startswith("H"):
-                            self.pending_transferred_h_charges[atom1.nr] = (
-                                atom1.charge
-                            )
-                            atom2.charge = (
-                                f"{float(atom2.charge) + float(atom1.charge):7.4f}"
-                            )
-                            atom1.charge = "0.0"
-                        elif atom2.type.upper().startswith("H"):
-                            self.pending_transferred_h_charges[atom2.nr] = (
-                                atom2.charge
-                            )
-                            atom1.charge = (
-                                f"{float(atom1.charge) + float(atom2.charge):7.4f}"
-                            )
-                            atom2.charge = "0.0"
-                        else:
-                            logger.warning(
-                                "Residue is not fragmented and no break atom is hydrogen. Doing nothing!"
-                            )
-                            continue
-                    else:
-                        # homolysis case (or similar)
+    def update_names_LJ(self, top_a: "Topology", recipe_steps: list[RecipeStep]) -> None:
+        """Set names, atom types (Lennard-Jones) and masses of the residues recipe steps touched.
 
-                        charge_fragment1 = [
-                            float(self.atoms[nr].charge) for nr in fragment1
-                        ]
-                        charge_fragment2 = [
-                            float(self.atoms[nr].charge) for nr in fragment2
-                        ]
-                        diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
-                        diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
-                        atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
-                        atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
-                else:
-                    # no change in partial charges necessary for break between residues
-                    continue
-            elif isinstance(step, Bind):
-                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
-                    atom1 = self.atoms[step.atom_id_1]
-                    atom2 = self.atoms[step.atom_id_2]
-                    if self.conserve_transferred_h_charge and (
-                        atom1.nr in self.pending_transferred_h_charges
-                        or atom2.nr in self.pending_transferred_h_charges
-                    ):
-                        # charge-conserving transfer (conserve_transferred_h_charge):
-                        # the H keeps its old charge and the acceptor gives up the
-                        # same amount, instead of taking the template charges
-                        self.pending_product_template_matches.pop(
-                            tuple(sorted((step.atom_id_1, step.atom_id_2), key=int)),
-                            None,
-                        )
-                        self._apply_transferred_h_charge_fallback(atom1, atom2)
-                        continue
-                    match_key = tuple(
-                        sorted((step.atom_id_1, step.atom_id_2), key=int)
-                    )
-                    template_match = self.pending_product_template_matches.pop(
-                        match_key,
-                        None,
-                    )
-                    if template_match is not None:
-                        for atom_nr, template_atom in (
-                            template_match.atom_mapping.items()
-                        ):
-                            current_atom = self.atoms.get(atom_nr)
-                            if current_atom is None:
-                                raise RuntimeError(
-                                    "Exact ITP product template match became "
-                                    f"invalid: atom {atom_nr} no longer exists."
-                                )
-                            if current_atom.atom != template_atom.name:
-                                raise RuntimeError(
-                                    "Exact ITP product template match became "
-                                    f"invalid for atom {atom_nr}: expected name "
-                                    f"{template_atom.name!r}, found "
-                                    f"{current_atom.atom!r}."
-                                )
-                            current_atom.type = template_atom.atom_type
-                            current_atom.charge = template_atom.charge
-                            current_atom.mass = (
-                                template_atom.mass
-                                if template_atom.mass is not None
-                                else self.ff.atomtypes[
-                                    template_atom.atom_type
-                                ].mass
-                            )
-                        logger.info(
-                            "Restored atom types, masses, and charges from exact "
-                            "ITP product template %s:%s (%s).",
-                            template_match.template.moleculetype,
-                            template_match.template.local_resnr,
-                            template_match.template.residue,
-                        )
-                        self.pending_product_template_restorations.append(
-                            template_match
-                        )
-                        self._discard_pending_transferred_h_charge(atom1, atom2)
-                        continue
+        This topology is the one after the steps (B), top_a the one before
+        them (A). The residue templates decide (assign_recipe_names). With
+        the final names, the touched residues then get their improper
+        dihedrals again from their rtp entries
+        (MoleculeType.update_residue_impropers).
+        """
+        logger.info("Updating atom names and types")
+        residues = assign_recipe_names(top_a, self, recipe_steps)
+        self.reactive_molecule.update_residue_impropers(
+            [residue.atoms for residue in residues], self.ff
+        )
 
-                    # check whether bond exists in topology
-                    residue = atom1.residue
-                    bondtype = (atom1.atom, atom2.atom)
-                    residuetype = self.ff.residuetypes.get(residue)
-                    if residuetype is None:
-                        m = f"Residue {residue} not found in residuetypes. Can't update partial charges!"
-                        logger.warning(m)
-                        self._apply_transferred_h_charge_fallback(atom1, atom2)
-                        continue
-                    residue_bond_spec = residuetype.bonds.get(
-                        bondtype,
-                        residuetype.bonds.get((bondtype[-1], bondtype[-2])),
-                    )
-                    if residue_bond_spec:
-                        atom1.charge = residuetype.atoms[atom1.atom].charge
-                        atom2.charge = residuetype.atoms[atom2.atom].charge
-                        self._discard_pending_transferred_h_charge(atom1, atom2)
-                    else:
-                        logger.warning(
-                            f"New bond defined in {step} but can't be found in residuetypes definition. Not changing the partial charges!"
-                        )
-                        self._apply_transferred_h_charge_fallback(atom1, atom2)
-                else:
-                    # no change in partial charges necessary
-                    continue
-            else:
-                continue
-
-    def _discard_pending_transferred_h_charge(
-        self, atom1: Atom, atom2: Atom
+    def update_charges(
+        self,
+        top_a: "Topology",
+        recipe_steps: list[RecipeStep],
+        template_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_check: str = "warn",
     ) -> None:
-        """Discard saved H charge after a product template restored charges."""
-        self.pending_transferred_h_charges.pop(atom1.nr, None)
-        self.pending_transferred_h_charges.pop(atom2.nr, None)
+        """Set the charges of the residues recipe steps touched and check the net charge.
 
-    def _apply_transferred_h_charge_fallback(
-        self, atom1: Atom, atom2: Atom
-    ) -> bool:
-        """Conserve residue charges when no product charge template is available."""
-        if atom1.nr in self.pending_transferred_h_charges:
-            hydrogen, acceptor = atom1, atom2
-        elif atom2.nr in self.pending_transferred_h_charges:
-            hydrogen, acceptor = atom2, atom1
-        else:
-            return False
+        This topology is the one after the steps (B), top_a the one before
+        them (A). See assign_recipe_charges and check_charge_conservation.
+        """
+        logger.info("Updating partial charges")
+        assign_recipe_charges(top_a, self, recipe_steps, tolerance=template_tolerance)
+        check_charge_conservation(
+            top_a,
+            self,
+            tolerance=conservation_tolerance,
+            action=conservation_check,
+        )
 
-        hydrogen_charge = self.pending_transferred_h_charges.pop(hydrogen.nr)
-        acceptor.charge = (
-            f"{float(acceptor.charge) - float(hydrogen_charge):7.4f}"
+    def update_nonbonded(
+        self,
+        top_a: "Topology",
+        recipe_steps: list[RecipeStep],
+        template_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_check: str = "warn",
+    ) -> None:
+        """Set names, atom types, masses and charges after recipe steps.
+
+        Names and types come first, so the charges match the residue
+        templates by the final names.
+        """
+        self.update_names_LJ(top_a, recipe_steps)
+        self.update_charges(
+            top_a,
+            recipe_steps,
+            template_tolerance=template_tolerance,
+            conservation_tolerance=conservation_tolerance,
+            conservation_check=conservation_check,
         )
-        hydrogen.charge = hydrogen_charge
-        logger.warning(
-            "No exact product charge template was available for transferred "
-            "hydrogen %s. Restored its pre-transfer charge and subtracted that "
-            "charge from acceptor atom %s.",
-            hydrogen.nr,
-            acceptor.nr,
-        )
-        return True
+
+    def update_all(
+        self,
+        top_a: Optional["Topology"],
+        recipe_steps: list[RecipeStep],
+        template_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_check: str = "warn",
+    ) -> ParameterizationReport:
+        """Update the topology after recipe steps: nonbonded, then bonded.
+
+        This topology is the one after the steps (B), top_a the one before
+        them (A), which stays unchanged. If top_a is None the steps did not
+        change the topology, and only the bonded parameters are updated. The
+        parameterizer may use charges and types, so they are final before it
+        runs. Afterwards only the radicals stay in the parameterization focus,
+        for the next event. Returns what update_bonded returns.
+        """
+        if top_a is not None:
+            self.update_nonbonded(
+                top_a,
+                recipe_steps,
+                template_tolerance=template_tolerance,
+                conservation_tolerance=conservation_tolerance,
+                conservation_check=conservation_check,
+            )
+        logger.info("Updating bonded parameters")
+        report = self.update_bonded()
+        self.parameterization_focus_ids = set(self.radicals)
+        return report
 
     def to_dict(self) -> TopologyDict:
-        self.update_parameters()
+        self.update_bonded()
         self._update_dict()
         return self.top
 
@@ -1833,7 +1511,7 @@ class Topology:
         update_map = update_map_all[REACTIVE_MOLECULEYPE]
 
         if parameterize:
-            self.update_parameters()
+            self.update_bonded()
             # Overwriting in case of no parameterization wanted
             self.needs_parameterization = False
             self.parameterization_focus_ids = set()
@@ -1995,7 +1673,9 @@ class Topology:
 
         Modifies the topology dictionary in place.
         It keeps track of affected terms in the topology via a graph representation of the topology
-        and applies the necessary changes to bonds, angles and dihedrals (proper and improper).
+        and applies the necessary changes to bonds, angles and proper dihedrals.
+        Improper dihedrals are set afterwards from the residue templates
+        (Topology.update_names_LJ).
         Furthermore, it modifies to function types in the topology to account for radicals.
 
         Parameters
@@ -2035,111 +1715,13 @@ class Topology:
                         "not registed in moleculetype.radicals"
                     )
 
-        # TODO: Do we still need this with grappa?
-        # quickfix for jumping hydrogens
-        # to make them adopt the correct residuetype and atomtype
-        # when bound to a new heavy atom
+        # a hydrogen joins the residue of its new partner; update_names_LJ
+        # gives it its name and type from the residue templates
         for i, atom in enumerate(atompair):
-            if atom.type.upper().startswith("H"):
-                other_i = abs(i - 1)
-                other_atom = atompair[other_i]
-                other_res = other_atom.residue
-                atom.residue = other_res
-                atom.resnr = other_atom.resnr
-
-                template_match = None
-                if "itp" in self.ff.product_template_sources:
-                    template_match = (
-                        self.ff.product_templates.match_hydrogenated_residue(
-                            topology=self,
-                            acceptor=other_atom,
-                            transferred_h=atom,
-                        )
-                    )
-                if template_match is not None:
-                    template_h = template_match.template.atoms[
-                        template_match.transferred_h_template_name
-                    ]
-                    atom.atom = template_h.name
-                    atom.type = template_h.atom_type
-                    atom.mass = (
-                        template_h.mass
-                        if template_h.mass is not None
-                        else self.ff.atomtypes[template_h.atom_type].mass
-                    )
-                    self.pending_product_template_matches[
-                        atompair_nrs
-                    ] = template_match
-                    logger.info(
-                        "Matched hydrogenated product to ITP template "
-                        "%s:%s (%s); assigned transferred H as %s with type %s.",
-                        template_match.template.moleculetype,
-                        template_match.template.local_resnr,
-                        template_match.template.residue,
-                        template_h.name,
-                        template_h.atom_type,
-                    )
-                    continue
-
-                if "rtp" not in self.ff.product_template_sources:
-                    logger.warning(
-                        "No exact ITP product template matched hydrogen binding "
-                        "to %s:%s (atom %s). Keeping the legacy atom identity "
-                        "and using Grappa bonded-parameter fallback.",
-                        other_atom.residue,
-                        other_atom.atom,
-                        other_atom.nr,
-                    )
-                    continue
-
-                # TODO: Extend exact RTP product matching to restore resolved
-                # bonded interactions, including cross-residue boundary terms.
-                aa = self.ff.residuetypes.get(other_res)
-                if not aa:
-                    logging.warning(
-                        f"No residuetype found in ff for {other_res}, to which a H would bind"
-                    )
-                    continue
-
-                other_residue = get_residue_by_bonding(
-                    other_atom, reactive_moleculetype.atoms
-                )
-                residue_atomnames_current = [a.atom for a in other_residue.values()]
-                name_set = False
-                for key, bond in aa.bonds.items():
-                    if other_atom.atom in key and any(
-                        k.upper().startswith("H") for k in key
-                    ):
-                        if key[0] == other_atom.atom:
-                            h_name = bond.atom2
-                        else:
-                            h_name = bond.atom1
-
-                        atom.type = aa.atoms[h_name].type
-                        if (
-                            not h_name in residue_atomnames_current
-                            or h_name == atom.atom
-                        ):
-                            atom.atom = h_name
-                            name_set = True
-                        else:
-                            atom.atom = "HX"
-                            name_set = True
-                            continue
-                        logger.debug(f"Hydrogen will be bound to {other_atom}.")
-                        break
-                else:
-                    if name_set:
-                        logger.warning(
-                            "Found new atomtype but not atomname for HAT hydrogen!"
-                        )
-                    else:
-                        logger.warning(
-                            "Found neither new atomtype nor atomname for HAT hydrogen!"
-                        )
-                if not name_set:
-                    atom.atom = "HX"
-                    logger.debug(f"Named newly bonded hydrogen 'HX'")
+            if is_hydrogen(atom.type):
+                partner = atompair[1 - i]
+                atom.residue = partner.residue
+                atom.resnr = partner.resnr
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
@@ -2157,16 +1739,6 @@ class Topology:
             str(x) for x in sorted([atompair[0].nr, atompair[1].nr], key=int)
         )  # type: ignore
         reactive_moleculetype.pairs.pop(bond_pairkey, None)
-
-        # and remove improper dihedrals connected to the bonds,
-        # as they will be re-added based on potentially changed residuetypes
-        to_pop = []
-        for key in reactive_moleculetype.improper_dihedrals.keys():
-            if atompair_nrs[0] in key or atompair_nrs[1] in key:
-                to_pop.append(key)
-
-        for key in to_pop:
-            reactive_moleculetype.improper_dihedrals.pop(key, None)
 
         # add angles
         angle_keys = reactive_moleculetype._get_atom_angles(
@@ -2210,31 +1782,6 @@ class Topology:
                     reactive_moleculetype.pairs[pairkey] = Pair(
                         pairkey[0], pairkey[1], FFFUNC["pair"]
                     )
-
-        # improper dihedral: re-add the template impropers of both atoms,
-        # every listed term (one per periodicity)
-        atom_impropers = reactive_moleculetype._get_atom_improper_dihedrals(
-            atompair_nrs[0], self.ff
-        )
-        atom_impropers.update(
-            reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
-        )
-        for key, specs in atom_impropers.items():
-            if reactive_moleculetype.improper_dihedrals.get(key) is None:
-                reactive_moleculetype.improper_dihedrals[key] = MultipleDihedrals(
-                    *key, FFFUNC["mult_improper_dihedral"], dihedrals={}
-                )
-            for value in specs:
-                periodicity = "" if value.c2 is None else value.c2
-                reactive_moleculetype.improper_dihedrals[key].dihedrals[periodicity] = (
-                    Dihedral(
-                        *key,
-                        FFFUNC["mult_improper_dihedral"],
-                        c0=value.c0,
-                        c1=value.c1,
-                        periodicity=periodicity,
-                    )
-                )
 
         # remove settles and explicit exclusions
         # those are used by solvent molecules

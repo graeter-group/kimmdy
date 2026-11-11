@@ -7,19 +7,18 @@ from math import sqrt
 import pytest
 from pathlib import Path
 import MDAnalysis as mda
-from kimmdy.recipe import Break, Place
-from kimmdy.parsing import read_plumed, read_top, write_top
+from kimmdy.recipe import Bind, Break, Place
+from kimmdy.parsing import read_top, write_top
 from kimmdy.constants import REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
-from kimmdy.tasks import TaskFiles
-from kimmdy.topology.atomic import Angle, Bond, BondType, Dihedral, Pair
+from kimmdy.topology.atomic import Angle, Atom, Bond, BondType, Dihedral, Pair
 from kimmdy.topology.topology import Topology
 from kimmdy.coordinates import (
+    AffectedInteractions,
     MoleculeTypeMerger,
     merge_top_slow_growth,
     get_explicit_or_type,
     place_atom,
-    break_bond_plumed,
 )
 
 
@@ -78,6 +77,55 @@ def test_implicit_interactions_ignore_generated_pairs():
     merger.ff = SimpleNamespace(defaults=[["1", "2", "yes", "0.5", "0.8333"]])
     merger.mol_a.bonds[("1", "2")] = Bond("1", "2", funct="1")
     assert merger._implicit_interactions("2") == ["bond 1-2"]
+
+
+@pytest.mark.parametrize(
+    "type_a, type_b, expected",
+    [
+        ("HO", "HC", "HC"),  # the B type has an LJ size: kept
+        ("HO", "HO", "H1"),  # lands on an oxygen again: no LJ size in B
+        ("HC", "HO", "H1"),  # moves onto an oxygen: no LJ size in B
+    ],
+)
+def test_retype_transferred_h_uses_b_type(type_a, type_b, expected):
+    """State B of the relax takes the B type of a moved H, H1 only where the B type has no LJ size."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.retype_transferred_h = True
+    merger.transferred_h_type = "H1"
+    merger.ff = SimpleNamespace(
+        atomtypes={
+            "HO": SimpleNamespace(epsilon="0.00000e+00"),
+            "HC": SimpleNamespace(epsilon="6.56888e-02"),
+            "H1": SimpleNamespace(epsilon="6.56888e-02"),
+        },
+        defaults=[["1", "2", "yes", "0.5", "0.8333"]],
+    )
+    # H 2 moves from atom 1 to atom 3; merge_atoms gave it its B type
+    h_a = Atom("2", type_a, "1", "RES", "H", "2", "0.4", "1.008")
+    if type_b != type_a:
+        h_a.typeB = type_b
+    h_b = Atom("2", type_b, "1", "RES", "H", "2", "0.4", "1.008")
+    merger.mol_a = SimpleNamespace(
+        atoms={"2": h_a},
+        bonds={
+            ("1", "2"): Bond("1", "2", funct="1", c0="0.0960", c1="462750.0"),
+            ("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0"),
+        },
+        angles={},
+        proper_dihedrals={},
+        improper_dihedrals={},
+        pairs={},
+    )
+    merger.mol_b = SimpleNamespace(
+        atoms={"2": h_b},
+        bonds={("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0")},
+    )
+    merger.affected_interactions = AffectedInteractions()
+
+    merger._retype_transferred_hydrogens()
+
+    assert h_a.type == type_a  # state A keeps its type
+    assert (h_a.typeB or h_a.type) == expected
 
 
 def test_get_explicit_MultipleDihedrals(arranged_tmp_path):
@@ -153,36 +201,6 @@ def test_place_atom(arranged_tmp_path):
     u = mda.Universe(str(files.output["gro"]))
     coords = tuple(u.select_atoms(f"id {step.id_to_place}")[0].position)
     assert coords == step.new_coords
-
-
-def test_plumed_break(arranged_tmp_path):
-    """
-    test plumed changes
-    """
-    files = TaskFiles(
-        get_latest=lambda: "DummyCallable",  # pyright: ignore
-    )
-    files.input = {
-        "plumed": arranged_tmp_path / "plumed_nat.dat",
-        "plumed_out": Path("distances.dat"),
-    }
-    files.outputdir = arranged_tmp_path
-    recipe_steps = [Break(28, 34)]
-    breakpair = (recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2)
-
-    break_bond_plumed(files, breakpair, Path("plumed_mod.dat"))
-    plumed_path = files.input["plumed"]
-    assert plumed_path is not None
-    plumed_nat = read_plumed(plumed_path)
-    plumed_break_ref = read_plumed(arranged_tmp_path / "plumed_break29-35.dat")
-    plumed_break_test = read_plumed(files.output["plumed"])
-
-    assert plumed_break_test["labeled_action"] == plumed_break_ref["labeled_action"]
-    assert plumed_break_test["prints"] == plumed_break_ref["prints"]
-    assert (
-        len(plumed_break_test["labeled_action"])
-        == len(plumed_nat["labeled_action"]) - 1
-    )
 
 
 def test_morse_parameters(arranged_tmp_path):
@@ -375,13 +393,69 @@ def test_merge_hat_top(arranged_tmp_path, caplog):
     assert top_a.exclusions == top_a_ref.exclusions
 
 
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_merge_uses_b_charges_in_both_states(arranged_tmp_path):
+    """The relaxation topology carries the charges of B; only types and masses are interpolated."""
+    top_a = Topology(read_top(Path("topol_stateA.top")))
+    top_b = Topology(read_top(Path("topol_stateB.top")))
+    merge_top_slow_growth(top_a=top_a, top_b=top_b)
+
+    for nr, atom in top_a.atoms.items():
+        assert atom.charge == top_b.atoms[nr].charge
+        assert atom.chargeB in (None, atom.charge)
+    assert top_a.atoms["26"].typeB is None  # only the charge differed
+    assert top_a.atoms["27"].typeB == "H1"  # the moved hydrogen still changes type
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_merge_morse_only_writes_b_types(arranged_tmp_path):
+    """morse_only gives an atom its B type even if its charge did not change."""
+    top_a = Topology(read_top(Path("topol_stateA.top")))
+    top_b = Topology(read_top(Path("topol_stateB.top")))
+    merge_top_slow_growth(top_a=top_a, top_b=top_b, morse_only=True)
+
+    # the moved H 27 has the same charge in A and B, but goes from H to H1
+    assert top_a.atoms["27"].type == "H"
+    assert top_a.atoms["27"].typeB == "H1"
+
+
+def _hat(top: Topology, donor: str, hydrogen: str, acceptor: str) -> None:
+    """Move a hydrogen from donor to acceptor as a recipe segment does: bonds, then names and types."""
+    top_before = copy.deepcopy(top)
+    top.break_bond((donor, hydrogen))
+    top.bind_bond((hydrogen, acceptor))
+    top.update_names_LJ(
+        top_before,
+        [
+            Break(atom_id_1=donor, atom_id_2=hydrogen),
+            Bind(atom_id_1=hydrogen, atom_id_2=acceptor),
+        ],
+    )
+
+
+def test_hat_keeps_impropers_of_acceptor_residue(arranged_tmp_path):
+    """An H that moves into a residue with an atom of its name keeps that atom's impropers.
+
+    H 17 (H of NME) moves to CA 9 of ALA, which has its own H 8. Once
+    update_names_LJ names it HA, ALA gets its impropers again and the amide
+    improper is (5 9 7 8).
+    """
+    top = Topology(read_top(Path("AlaCaR_out.top")))
+    assert ("5", "9", "7", "8") in top.improper_dihedrals
+
+    _hat(top, "16", "17", "9")
+
+    assert top.atoms["17"].atom == "HA"
+    assert ("5", "9", "7", "8") in top.improper_dihedrals
+    assert ("5", "9", "7", "17") not in top.improper_dihedrals
+
+
 def test_merge_small_hat_details(arranged_tmp_path, caplog):
     top = Topology(read_top(Path("AlaCaR_out.top")))
     top_a = copy.deepcopy(top)
     top_b = top
 
-    top_b.break_bond(("7", "8"))
-    top_b.bind_bond(("8", "9"))
+    _hat(top_b, "7", "8", "9")
     merger = MoleculeTypeMerger(
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         top_b.moleculetypes[REACTIVE_MOLECULEYPE],
@@ -503,8 +577,7 @@ def test_union_exclusion_reconciliation_keeps_connected_hat_behavior(
     top_a = copy.deepcopy(top)
     top_b = copy.deepcopy(top)
 
-    top_b.break_bond(("7", "8"))
-    top_b.bind_bond(("8", "9"))
+    _hat(top_b, "7", "8", "9")
 
     merger = MoleculeTypeMerger(
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
@@ -519,15 +592,13 @@ def test_union_exclusion_reconciliation_keeps_connected_hat_behavior(
 def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
     top = Topology(read_top(Path("AlaCaR_out.top")))
     # move the radical to N16 before we start
-    top.break_bond(("16", "17"))
-    top.bind_bond(("9", "17"))
+    _hat(top, "16", "17", "9")
 
     top_a = copy.deepcopy(top)
     top_b = top
 
     # now the hat to investigate
-    top_b.break_bond(("18", "21"))
-    top_b.bind_bond(("16", "21"))
+    _hat(top_b, "18", "21", "16")
 
     merger = MoleculeTypeMerger(
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
@@ -575,8 +646,7 @@ def test_merge_small_hat_harmonic_acceptor_h_term(arranged_tmp_path):
         """Move the H from atom 7 to atom 9, build the relax topology with or without the spring, and return it as text sections."""
         top = Topology(read_top(Path("AlaCaR_out.top")))
         top_a = copy.deepcopy(top)
-        top.break_bond(("7", "8"))
-        top.bind_bond(("8", "9"))
+        _hat(top, "7", "8", "9")
         merge_top_slow_growth(top_a, top, harmonic_acceptor_h_relax_term=helper)
         return top_a.to_dict()
 
@@ -607,8 +677,7 @@ def _hat_states(case: str) -> tuple[Topology, Topology]:
     if case == "small":
         top_b = Topology(read_top(Path("AlaCaR_out.top")))
         top_a = copy.deepcopy(top_b)
-        top_b.break_bond(("7", "8"))
-        top_b.bind_bond(("8", "9"))
+        _hat(top_b, "7", "8", "9")
         return top_a, top_b
     return Topology(read_top(Path("topol_stateA.top"))), Topology(read_top(Path("topol_stateB.top")))
 
@@ -667,3 +736,155 @@ def test_parallel_dihedral_merge_matches_serial(arranged_tmp_path, case):
 
     # the same written lines, in the same order
     assert parallel_lines == serial_lines
+
+
+def _lj_test_ff():
+    """A small Amber-like force field: HO and HW without LJ size, H the smallest H type with one."""
+    return SimpleNamespace(
+        atomtypes={
+            "HO": SimpleNamespace(sigma="0.00000e+00", epsilon="0.00000e+00"),
+            "HW": SimpleNamespace(sigma="0.00000e+00", epsilon="0.00000e+00"),
+            "H": SimpleNamespace(sigma="1.06908e-01", epsilon="6.56888e-02"),
+            "HS": SimpleNamespace(sigma="1.06908e-01", epsilon="6.56888e-02"),
+            "H1": SimpleNamespace(sigma="2.47135e-01", epsilon="6.56888e-02"),
+            "HC": SimpleNamespace(sigma="2.64953e-01", epsilon="6.56888e-02"),
+            "OH": SimpleNamespace(sigma="3.06647e-01", epsilon="8.80314e-01"),
+        },
+        defaults=[["1", "2", "yes", "0.5", "0.8333"]],
+    )
+
+
+def test_find_lj_hydrogen_type_picks_smallest_lj_hydrogen():
+    """The stand-in for hydrogens without LJ size is the H type with the smallest non-zero size (H in Amber)."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.ff = _lj_test_ff()
+    assert merger._find_lj_hydrogen_type() == "H"
+
+
+@pytest.mark.parametrize(
+    "type_a, type_b, expected_b",
+    [
+        ("HO", "HC", "HC"),  # O-H onto carbon: B keeps the product type
+        ("HO", "HO", "H"),  # O-H onto oxygen
+        ("HW", "H", "H"),  # water H onto nitrogen
+    ],
+)
+def test_moving_lj_free_h_gets_lj_in_both_states(type_a, type_b, expected_b):
+    """A moving H without LJ size in A gets H in state A; state B keeps its type, charge and mass."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.retype_transferred_h = True
+    merger.transferred_h_type = "H"
+    merger.ff = _lj_test_ff()
+    # H 2 moves from atom 1 to atom 3; merge_atoms gave it its B type
+    h_a = Atom("2", type_a, "1", "RES", "H", "2", "0.4", "1.008")
+    if type_b != type_a:
+        h_a.typeB = type_b
+    h_b = Atom("2", type_b, "1", "RES", "H", "2", "0.4", "1.008")
+    merger.mol_a = SimpleNamespace(
+        atoms={"2": h_a},
+        bonds={
+            ("1", "2"): Bond("1", "2", funct="1", c0="0.0960", c1="462750.0"),
+            ("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0"),
+        },
+        angles={},
+        proper_dihedrals={},
+        improper_dihedrals={},
+        pairs={},
+    )
+    merger.mol_b = SimpleNamespace(
+        atoms={"2": h_b},
+        bonds={("2", "3"): Bond("2", "3", funct="1", c0="0.1090", c1="284512.0")},
+    )
+    merger.affected_interactions = AffectedInteractions()
+    merger.moving_hydrogens = {"2"}
+
+    merger._retype_transferred_hydrogens()
+    merger._give_moving_hydrogens_lj_in_state_a()
+
+    assert h_a.type == "H"
+    assert h_a.typeB == expected_b
+    # GROMACS takes a missing chargeB from the atom type (0), so both are written
+    assert h_a.chargeB == "0.4"
+    assert h_a.massB == "1.008"
+
+
+def test_non_moving_lj_free_h_keeps_state_a_type():
+    """A water H that stays on its oxygen keeps its type in state A (its bond stays harmonic)."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.retype_transferred_h = True
+    merger.transferred_h_type = "H"
+    merger.ff = _lj_test_ff()
+    h_a = Atom("2", "HW", "1", "SOL", "HW1", "2", "0.4", "1.008")
+    h_a.typeB = "HO"
+    merger.mol_a = SimpleNamespace(atoms={"2": h_a})
+    merger.moving_hydrogens = set()
+
+    merger._give_moving_hydrogens_lj_in_state_a()
+
+    assert h_a.type == "HW"
+
+
+def test_lj_free_h_pairs_use_h_in_both_states():
+    """Pair terms and Morse lengths look up a hydrogen without LJ size as H, in state A and B."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.ff = _lj_test_ff()
+    merger.transferred_h_type = "H"
+    atoms = {
+        "1": Atom("1", "OH", "1", "RES", "O", "1", "-0.6", "16.0"),
+        "2": Atom("2", "HO", "1", "RES", "H", "2", "0.4", "1.008"),
+    }
+    merger.mol_a = SimpleNamespace(atoms=atoms)
+    merger.mol_b = SimpleNamespace(atoms=atoms)
+
+    for use_state_b in (False, True):
+        sigma, epsilon = merger._get_LJ_parameters("1", "2", use_state_b=use_state_b)
+        assert sigma == pytest.approx(0.5 * (0.106908 + 0.306647))
+        assert epsilon == pytest.approx(sqrt(0.0656888 * 0.880314))
+
+
+def test_check_hydrogen_lj_warns_for_h_without_lj(caplog, monkeypatch):
+    """The merge warns if a moving H, or a pair with an H whose atoms see each other, has no LJ."""
+    # an earlier test may have loaded a KIMMDY config, whose logging setup
+    # stops kimmdy records from reaching the root logger that caplog listens on
+    monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
+    caplog.set_level(logging.WARNING, logger="kimmdy.coordinates")
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.ff = _lj_test_ff()
+    o = Atom("1", "OH", "1", "RES", "O", "1", "-0.6", "16.0")
+    h = Atom("2", "HO", "1", "RES", "H", "2", "0.4", "1.008")
+    h.typeB = "H"
+    merger.mol_a = SimpleNamespace(atoms={"1": o, "2": h}, pairs={}, nrexcl="3")
+    merger.mol_b = SimpleNamespace(nrexcl="3")
+    merger.moving_hydrogens = {"2"}
+    # O and H are not bonded in A or B, so they see each other in both states
+    merger._bond_graph_a = {"1": set(), "2": set()}
+    merger._bond_graph_b = {"1": set(), "2": set()}
+    merger._pairs_a = set()
+    merger._pairs_b = set()
+    merger._explicit_exclusions_a = set()
+    merger._explicit_exclusions_b = set()
+
+    # moving H still HO (no LJ) in state A
+    merger._check_hydrogen_lj()
+    assert "moving H 2 has type HO without LJ size in state A" in caplog.text
+    caplog.clear()
+
+    # with H in state A the atom passes ...
+    h.type = "H"
+    merger._check_hydrogen_lj()
+    assert "Lennard-Jones core" not in caplog.text
+
+    # ... but a pair without LJ in A, where O and H see each other, does not
+    merger.mol_a.pairs = {
+        ("1", "2"): Pair(
+            "1", "2", funct="1", c0="0.15332", c1="0.00000", c2="0.20678", c3="0.24047"
+        )
+    }
+    merger._check_hydrogen_lj()
+    assert "pair 1-2 has no LJ in state A" in caplog.text
+    caplog.clear()
+
+    # the same pair passes when O and H are bonded (excluded) in A
+    merger._bond_graph_a = {"1": {"2"}, "2": {"1"}}
+    merger._check_hydrogen_lj()
+    assert "Lennard-Jones core" not in caplog.text

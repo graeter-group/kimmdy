@@ -20,7 +20,7 @@ from kimmdy.topology.atomic import (
     ProperDihedralId,
     ResidueType,
 )
-from kimmdy.topology.product_templates import ProductTemplateLibrary
+from kimmdy.topology.templates import TemplateLibrary
 from kimmdy.topology.utils import get_top_section
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,9 @@ class FF:
                 "Product template transitions require itp in "
                 "product_template_sources."
             )
-        self.product_templates = ProductTemplateLibrary()
+        # residue templates from the ITP files and the rtp entries
+        # (atomtypes is filled below; the library keeps the same dict)
+        self.templates = TemplateLibrary(atomtypes=self.atomtypes)
 
         ffdir: Optional[Path] = top["ffdir"]
 
@@ -133,14 +135,9 @@ class FF:
                     "ITP product templates require a configured force-field "
                     "directory. Set 'ff' in the KIMMDY configuration."
                 )
-            self.product_templates = ProductTemplateLibrary.from_itp_directory(
-                ffdir=ffdir,
-                pattern=product_template_itp_glob,
-            )
-            self.product_templates.validate_atomtypes(self.atomtypes)
-            self.product_templates.set_transitions(
-                product_template_transitions or {}
-            )
+            self.templates.load_itp(ffdir, product_template_itp_glob)
+            self.templates.validate_atomtypes(self.atomtypes)
+            self.templates.set_transitions(product_template_transitions or {})
 
         if "rtp" not in self.product_template_sources:
             return
@@ -171,6 +168,7 @@ class FF:
                     v["subsections"],
                     repeated_lines=repeated_topology_lines,
                 )
+        self.templates.add_rtp(self.residuetypes)
 
         # one warning for all residue templates whose repeated impropers were merged
         merged = {

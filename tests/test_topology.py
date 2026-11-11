@@ -10,6 +10,8 @@ from hypothesis import strategies as st
 from kimmdy.parsing import TopologyDict, read_top
 from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
+from kimmdy.topology.charges import assign_recipe_charges
+from kimmdy.topology.templates import assign_recipe_names
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.utils import (
     get_protein_section,
@@ -108,6 +110,27 @@ def rtp_psi_terms(rtp: Path, residue: str) -> dict[str, tuple[float, float]]:
             phase, k = combine_periodic_terms([terms[n], (phase, k)])
         terms[n] = (phase, k)
     return {n: (float(phase), float(k)) for n, (phase, k) in terms.items()}
+
+
+def _residue_of(top: Topology, resnr: str) -> dict[str, Atom]:
+    """The atoms of a residue of the reactive molecule, found along the bonds."""
+    mol = top.reactive_molecule
+    atom = next(a for a in mol.atoms.values() if a.resnr == resnr)
+    return get_residue_by_bonding(atom, mol.atoms)
+
+
+def _atom_impropers(mol, atom_nr: str, ff) -> dict:
+    """The rtp impropers that contain one atom.
+
+    From the residue lookups of the atom's residue and its previous and next
+    residue, as the former MoleculeType._get_atom_improper_dihedrals gave them.
+    """
+    residue = get_residue_by_bonding(mol.atoms[atom_nr], mol.atoms)
+    neighbors = [a for a in mol._get_neighbor_residue_atoms(residue) if a is not None]
+    impropers = {}
+    for res in [residue, *(get_residue_by_bonding(a, mol.atoms) for a in neighbors)]:
+        impropers.update(mol._get_residue_improper_dihedrals(res, ff) or {})
+    return {key: specs for key, specs in impropers.items() if atom_nr in key}
 
 
 @pytest.fixture()
@@ -443,6 +466,15 @@ class TestTopology:
         with pytest.raises(ValueError):
             top.bind_bond(bond_key)
 
+        # impropers are set from the residue templates after the steps
+        top.update_names_LJ(
+            og_top,
+            [
+                Break(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+                Bind(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+            ],
+        )
+
         top.to_path("/tmp/top.top")
 
         assert top.bonds == og_top.bonds
@@ -477,6 +509,14 @@ class TestTopology:
         assert top.bonds.get(bond_key) is None
         top.bind_bond(bond_key)
         assert top.bonds.get(bond_key) is not None
+        # impropers are set from the residue templates after the steps
+        top.update_names_LJ(
+            og_top,
+            [
+                Break(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+                Bind(atom_id_1=bond_key[0], atom_id_2=bond_key[1]),
+            ],
+        )
 
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
@@ -740,7 +780,7 @@ class TestHexalaTopology:
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
         proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
-        improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
+        improper_dihedrals = _atom_impropers(protein, atomnr, top.ff)
         assert len(bonds) == 4
         assert len(angles) == 13
         assert len(proper_dihedrals) == 25
@@ -750,7 +790,7 @@ class TestHexalaTopology:
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
         proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
-        improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
+        improper_dihedrals = _atom_impropers(protein, atomnr, top.ff)
         assert len(bonds) == 3
         assert len(angles) == 8
         assert len(proper_dihedrals) == 18
@@ -792,6 +832,7 @@ class TestHexalaTopology:
         """HAT of H at 34 to C at 29"""
         top = deepcopy(hexala_top_fix)
         top_ref = deepcopy(top_hat_34_to_29_fix)
+        top_a = deepcopy(top)
         top.break_bond(("29", "35"))
         top.break_bond(("31", "34"))
         top.bind_bond(("34", "29"))
@@ -802,6 +843,16 @@ class TestHexalaTopology:
         assert len(top.angles) == len(top_ref.angles)
         assert len(top.proper_dihedrals) == len(top_ref.proper_dihedrals)
         # assert len(top.improper_dihedrals) == len(top_ref.improper_dihedrals)
+
+        # names and types come from the residue templates after the steps
+        top.update_names_LJ(
+            top_a,
+            [
+                Break(atom_id_1="29", atom_id_2="35"),
+                Break(atom_id_1="31", atom_id_2="34"),
+                Bind(atom_id_1="34", atom_id_2="29"),
+            ],
+        )
 
         # inspect HAT hydrogen
         h = top.atoms["34"]
@@ -867,11 +918,10 @@ class TestHexalaTopology:
         top = deepcopy(hexala_radical_top_fix)
         mol = top.reactive_molecule
         assert list(top.radicals) == ["9"]
+        top_a = deepcopy(top)
 
         # backbone impropers on C 14 (residue 2) and N 56 (residue 7) before any transfer
-        before = {
-            nr: set(mol._get_atom_improper_dihedrals(nr, top.ff)) for nr in ("14", "56")
-        }
+        before = {nr: set(_atom_impropers(mol, nr, top.ff)) for nr in ("14", "56")}
 
         # H 61 (residue 7) moves onto the radical CA 9 (residue 2),
         # then H 11 (residue 2) moves onto the new radical CB 60 (residue 7)
@@ -879,6 +929,16 @@ class TestHexalaTopology:
         top.bind_bond(("9", "61"))
         top.break_bond(("10", "11"))
         top.bind_bond(("60", "11"))
+        # the residues match their rtp entries once the moved H have their names
+        top.update_names_LJ(
+            top_a,
+            [
+                Break(atom_id_1="60", atom_id_2="61"),
+                Bind(atom_id_1="9", atom_id_2="61"),
+                Break(atom_id_1="10", atom_id_2="11"),
+                Bind(atom_id_1="60", atom_id_2="11"),
+            ],
+        )
         residue_2 = get_residue_by_bonding(atom=mol.atoms["14"], atoms=mol.atoms)
         residue_7 = get_residue_by_bonding(atom=mol.atoms["64"], atoms=mol.atoms)
         assert "61" in residue_2 and "11" in residue_7
@@ -895,7 +955,7 @@ class TestHexalaTopology:
 
         # so the backbone impropers are the same as before the transfers
         for nr in ("14", "56"):
-            assert set(mol._get_atom_improper_dihedrals(nr, top.ff)) == before[nr]
+            assert set(_atom_impropers(mol, nr, top.ff)) == before[nr]
 
 
 class TestA99SBdispPsi:
@@ -999,6 +1059,33 @@ class TestRadicalAla:
         assert top_noprm_explicitR_fix.atoms["9"].is_radical == True
         assert top_noprm_explicitR_fix.atoms["10"].is_radical == False
 
+    def test_find_radicals_multiple_bond_orders(self, top_noprm_fix):
+        # N3 is used for neutral (3 bonds) and protonated (4 bonds) amines
+        moltype = top_noprm_fix.moleculetypes[REACTIVE_MOLECULEYPE]
+        assert len(moltype.atoms["9"].bound_to_nrs) == 3
+        assert len(moltype.atoms["10"].bound_to_nrs) == 4
+        assert len(moltype.atoms["8"].bound_to_nrs) == 1
+        for nr in ["8", "9", "10"]:
+            moltype.atoms[nr].type = "N3"
+        moltype.find_radicals()
+        assert moltype.atoms["9"].is_radical == False
+        assert moltype.atoms["10"].is_radical == False
+        assert moltype.atoms["8"].is_radical == True
+        assert set(moltype.radicals.keys()) == {"8"}
+
+    def test_find_radicals_warns_on_too_many_bonds(
+        self, top_noprm_fix, caplog, monkeypatch
+    ):
+        # earlier tests may configure the kimmdy logger with propagate=False
+        monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
+        moltype = top_noprm_fix.moleculetypes[REACTIVE_MOLECULEYPE]
+        # CB has 4 bonds, but N only allows 3
+        moltype.atoms["10"].type = "N"
+        with caplog.at_level(logging.WARNING, logger="kimmdy.topology"):
+            moltype.find_radicals()
+        assert moltype.atoms["10"].is_radical == False
+        assert "('N', 4)" in caplog.text
+
 
 class TestChargeAssignment:
     @pytest.fixture
@@ -1008,9 +1095,9 @@ class TestChargeAssignment:
 
     def test_break_neutral(self, top_charged: Topology):
         recipe_steps = [Break(atom_id_1="7", atom_id_2="9")]
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
-        assert top_charged.pending_transferred_h_charges == {}
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = ["7", "8"]
         fragment2_nrs = [str(i) for i in range(9, 26)]
         assert np.isclose(
@@ -1022,8 +1109,9 @@ class TestChargeAssignment:
 
     def test_break_negative(self, top_charged: Topology):
         recipe_steps = [Break(atom_id_1="69", atom_id_2="80")]
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = [str(i) for i in range(67, 80)]
         fragment2_nrs = ["80", "81"]
         assert np.isclose(
@@ -1035,8 +1123,9 @@ class TestChargeAssignment:
 
     def test_break_positive(self, top_charged: Topology):
         recipe_steps = [Break(atom_id_1="33", atom_id_2="36")]
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = [str(i) for i in range(26, 36)] + ["48", "49"]
         fragment2_nrs = [str(i) for i in range(36, 48)]
         assert np.isclose(
@@ -1052,9 +1141,10 @@ class TestChargeAssignment:
             Bind(atom_id_1="52", atom_id_2="51"),
         ]
         top_charged.del_atom("53")
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
         top_charged.bind_bond((recipe_steps[1].atom_id_1, recipe_steps[1].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = [str(i) for i in range(50, 66)]
         assert np.isclose(
             sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), 0
@@ -1137,24 +1227,17 @@ class TestDimerization:
             C5    N3    C4    O4
             C4    C2    N3    H3
         """
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "12", top_target.ff
-        )
+        mol = top_target.reactive_molecule
+        atom_impropers = _atom_impropers(mol, "12", top_target.ff)
         assert list(atom_impropers.keys()) == [("9", "11", "12", "23")]
 
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "14", top_target.ff
-        )
+        atom_impropers = _atom_impropers(mol, "14", top_target.ff)
         assert list(atom_impropers.keys()) == [("14", "21", "19", "20")]
 
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "44", top_target.ff
-        )
+        atom_impropers = _atom_impropers(mol, "44", top_target.ff)
         assert list(atom_impropers.keys()) == [("41", "43", "44", "55")]
 
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "46", top_target.ff
-        )
+        atom_impropers = _atom_impropers(mol, "46", top_target.ff)
         assert list(atom_impropers.keys()) == [("46", "53", "51", "52")]
 
     def test_dimerization(self, top_init: Topology, top_target: Topology):
@@ -1179,8 +1262,17 @@ class TestDimerization:
         # NOTE: the plugin would also update partial charges,
         # we don't test that here
 
+        top_a = deepcopy(top)
         top.bind_bond(("14", "46"))
         top.bind_bond(("12", "44"))
+        # impropers are set from the residue templates after the steps
+        top.update_names_LJ(
+            top_a,
+            [
+                Bind(atom_id_1="14", atom_id_2="46"),
+                Bind(atom_id_1="12", atom_id_2="44"),
+            ],
+        )
 
         top.to_path("/tmp/updated.top")
 
@@ -1209,8 +1301,6 @@ def plpc_itp_topology() -> Topology:
         radicals="222",  # Radical C33: 132 closed-shell atoms + local atom 90.
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
-        # Explicitly retain product-template restoration for these tests.
-        conserve_transferred_h_charge=False,
     )
 
 
@@ -1240,6 +1330,7 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
     """A full HAT applies the exact ITP product state without changing charge."""
     top = plpc_itp_topology
     donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
+    top_a = deepcopy(top)
     initial_total_charge = sum(float(atom.charge) for atom in top.atoms.values())
     expected_donor_charge = float(donor.charge) + float(donor_h.charge)
     acceptor_resnr = acceptor.resnr
@@ -1249,14 +1340,10 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
         Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr),
     ]
     top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([recipe_steps[0]])
-    assert donor_h.nr in top.pending_transferred_h_charges
     top.bind_bond((acceptor.nr, donor_h.nr))
 
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    assert match_key in top.pending_product_template_matches
-
-    top.update_partial_charges([recipe_steps[1]])
+    assign_recipe_charges(top_a, top, recipe_steps)
+    assign_recipe_names(top_a, top, recipe_steps)
 
     assert tuple(sorted((donor.nr, donor_h.nr), key=int)) not in top.bonds
     assert tuple(sorted((acceptor.nr, donor_h.nr), key=int)) in top.bonds
@@ -1267,8 +1354,8 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
 
     closed_template = next(
         template
-        for template in top.ff.product_templates.templates["PLPC"]
-        if template.moleculetype == "PLPC"
+        for template in top.ff.templates.itp["PLPC"]
+        if template.name == "PLPC"
     )
     product_atoms = [
         atom for atom in top.atoms.values() if atom.resnr == acceptor_resnr
@@ -1276,74 +1363,19 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
     assert {atom.atom for atom in product_atoms} == set(closed_template.atoms)
     for atom in product_atoms:
         expected = closed_template.atoms[atom.atom]
-        assert atom.type == expected.atom_type
-        assert atom.charge == expected.charge
+        assert atom.type == expected.type
+        assert np.isclose(float(atom.charge), float(expected.charge))
         assert atom.mass == (
             expected.mass
             if expected.mass is not None
-            else top.ff.atomtypes[expected.atom_type].mass
+            else top.ff.atomtypes[expected.type].mass
         )
 
     assert np.isclose(
         sum(float(atom.charge) for atom in top.atoms.values()),
         initial_total_charge,
     )
-    assert match_key not in top.pending_product_template_matches
-    assert donor_h.nr not in top.pending_transferred_h_charges
     assert {donor.nr, donor_h.nr, acceptor.nr} <= top.parameterization_focus_ids
-
-
-def test_itp_product_restores_bonded_terms_and_compacts_focus(
-    plpc_itp_topology,
-):
-    """Exact products regain ITP terms before active radicals take precedence."""
-
-    class RecordingParameterizer:
-        def __init__(self):
-            self.calls = []
-
-        def parameterize_topology(self, current_topology, focus_nrs=None):
-            self.calls.append(set(focus_nrs or set()))
-            return current_topology
-
-    top = plpc_itp_topology
-    recorder = RecordingParameterizer()
-    top.parametrizer = recorder
-    donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
-    break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
-    bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
-
-    top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([break_step])
-    top.bind_bond((acceptor.nr, donor_h.nr))
-    top.update_partial_charges([bind_step])
-
-    assert len(top.pending_product_template_restorations) == 1
-    match = top.pending_product_template_restorations[0]
-    template_angle = next(
-        line for line in match.template.angle_lines if line[3] == "5"
-    )
-    mapped = [match.local_to_global[atom_nr] for atom_nr in template_angle[:3]]
-    if int(mapped[0]) > int(mapped[2]):
-        mapped[0], mapped[2] = mapped[2], mapped[0]
-    angle_key = tuple(mapped)
-    top.angles[angle_key] = Angle(
-        *angle_key, funct="1", c0="1.0", c1="1.0"
-    )
-    event_focus = set(top.parameterization_focus_ids)
-
-    report = top.prepare_product_parameters()
-
-    restored_angle = top.angles[angle_key]
-    assert restored_angle.funct == "5"
-    assert restored_angle.c2 is not None
-    assert restored_angle.c3 is not None
-    assert report.event_focus_ids == event_focus
-    assert report.active_radical_ids == {donor.nr}
-    assert report.restored_templates == 1
-    assert recorder.calls == [event_focus, {donor.nr}]
-    assert top.parameterization_focus_ids == {donor.nr}
-    assert top.pending_product_template_restorations == []
 
 
 def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
@@ -1371,14 +1403,12 @@ def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
     initial_acceptor_charge = float(acceptor.charge)
     break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
     bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
+    top_a = deepcopy(top)
 
     top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([break_step])
     top.bind_bond((acceptor.nr, donor_h.nr))
-    top.update_partial_charges([bind_step])
+    assign_recipe_charges(top_a, top, [break_step, bind_step])
 
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    assert match_key not in top.pending_product_template_matches
     assert donor_h.atom == original_h_name
     assert donor_h.type == original_h_type
     assert np.isclose(float(donor.charge), expected_donor_charge)
@@ -1407,7 +1437,6 @@ def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
         sum(float(atom.charge) for atom in top.atoms.values()),
         initial_total_charge,
     )
-    assert donor_h.nr not in top.pending_transferred_h_charges
 
 
 def test_itp_template_precedes_rtp_fallback():
@@ -1421,13 +1450,21 @@ def test_itp_template_precedes_rtp_fallback():
         product_template_itp_glob="*.itp",
     )
     donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
+    top_a = deepcopy(top)
 
     top.break_bond((donor.nr, donor_h.nr))
     top.bind_bond((acceptor.nr, donor_h.nr))
 
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    match = top.pending_product_template_matches[match_key]
-    assert match.template.moleculetype == "PLPC"
+    residue = get_residue_by_bonding(acceptor, top.atoms)
+    match = top.ff.templates.match_itp(residue, {donor_h.nr}, top.atoms, top_a.atoms)
+    assert match.template.name == "PLPC"
+    # charges and names after the recipe segment
+    recipe_steps = [
+        Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr),
+        Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr),
+    ]
+    assign_recipe_charges(top_a, top, recipe_steps)
+    assign_recipe_names(top_a, top, recipe_steps)
     assert donor_h.atom == "H3X"
 
 
@@ -1440,8 +1477,6 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
         product_template_transitions={"OHR": "OHRH"},
-        # Explicitly retain product-template restoration for this test.
-        conserve_transferred_h_charge=False,
     )
     acceptor = next(atom for atom in top.atoms.values() if atom.type == "ORA")
     donor = next(atom for atom in top.atoms.values() if atom.type == "OT")
@@ -1455,14 +1490,11 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
     break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
     bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
 
+    top_a = deepcopy(top)
     top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([break_step])
-    assert donor_h.nr in top.pending_transferred_h_charges
-
     top.bind_bond((acceptor.nr, donor_h.nr))
-    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
-    assert match_key in top.pending_product_template_matches
-    top.update_partial_charges([bind_step])
+    assign_recipe_charges(top_a, top, [break_step, bind_step])
+    assign_recipe_names(top_a, top, [break_step, bind_step])
 
     product_atoms = {
         atom.atom: atom
@@ -1486,8 +1518,6 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
         sum(float(atom.charge) for atom in top.atoms.values()),
         initial_total_charge,
     )
-    assert match_key not in top.pending_product_template_matches
-    assert donor_h.nr not in top.pending_transferred_h_charges
 
 
 def _alacar_with_extra_lines(section: str, extra: list[list[str]]) -> dict:
@@ -1653,3 +1683,84 @@ def test_repeated_template_impropers_in_all_modes(mode, expected):
     template = ResidueType.from_section("ALA", section, repeated_lines=mode)
     (term,) = template.improper_dihedrals[("N", "CA", "C", "+N")]
     assert (term.c0, term.c1) == expected
+
+
+class TestResidueImpropers:
+    def test_termini_get_the_impropers_of_their_terminal_entries(self, r10_a99sbdisp_top_fix):
+        """pdb2gmx built residue 1 from NSER and residue 86 from CTYR; rebuilding gives the same impropers.
+
+        The topology names them SER and TYR. Matched by atoms and bonds, the
+        N-terminus gets no psi correction (N CA C +N) and the C-terminus
+        keeps CA OC1 C OC2.
+        """
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        before = set(mol.improper_dihedrals)
+        first, last = _residue_of(top, "1"), _residue_of(top, "86")
+
+        mol.update_residue_impropers([first, last], top.ff)
+
+        def names(key):
+            return [mol.atoms[nr].atom for nr in key]
+
+        assert set(mol.improper_dihedrals) == before
+        assert not any(
+            names(key) == ["N", "CA", "C", "N"] and key[0] in first
+            for key in mol.improper_dihedrals
+        )
+        assert any(
+            sorted(names(key)) == ["C", "CA", "OC1", "OC2"] for key in mol.improper_dihedrals
+        )
+
+    def test_residue_without_matching_entry_keeps_its_impropers(
+        self, r10_a99sbdisp_top_fix, caplog, monkeypatch
+    ):
+        """A SER whose OG is renamed matches no rtp entry: a warning, and its impropers stay."""
+        # an earlier test may have loaded a KIMMDY config, whose logging setup
+        # stops kimmdy records from reaching the root logger that caplog listens on
+        monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        residue = _residue_of(top, "2")
+        next(a for a in residue.values() if a.atom == "OG").atom = "OX"
+        before = deepcopy(mol.improper_dihedrals)
+
+        with caplog.at_level(logging.WARNING):
+            mol.update_residue_impropers([residue], top.ff)
+
+        assert mol.improper_dihedrals == before
+        assert "No rtp entry matches residue SER 2" in caplog.text
+
+    def test_split_residue_keeps_its_impropers_without_warning(
+        self, r10_a99sbdisp_top_fix, caplog
+    ):
+        """A residue split by a broken CA-C bond is skipped silently."""
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        residue = _residue_of(top, "2")
+        ca = next(nr for nr, a in residue.items() if a.atom == "CA")
+        c = next(nr for nr, a in residue.items() if a.atom == "C")
+        top.break_bond((ca, c))
+        before = deepcopy(mol.improper_dihedrals)
+
+        with caplog.at_level(logging.WARNING):
+            mol.update_residue_impropers([residue], top.ff)
+
+        assert mol.improper_dihedrals == before
+        assert "No rtp entry" not in caplog.text
+
+    def test_impropers_with_two_atoms_outside_are_kept(self, r10_a99sbdisp_top_fix):
+        """An improper with two atoms outside the residue (e.g. of a crosslink) belongs to no residue."""
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+        residue = _residue_of(top, "2")
+        own = sorted(residue, key=int)
+        far = sorted(_residue_of(top, "4"), key=int)
+        key = (own[0], own[1], far[0], far[1])
+        mol.improper_dihedrals[key] = MultipleDihedrals(
+            *key, "4", dihedrals={"": Dihedral(*key, "4")}
+        )
+
+        mol.update_residue_impropers([residue], top.ff)
+
+        assert key in mol.improper_dihedrals
