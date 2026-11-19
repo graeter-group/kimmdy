@@ -5,7 +5,7 @@
 [submodule "plugins/kimmdy-hat"]
 	path = plugins/kimmdy-hat
 	url = git@github.com:graeter-group/KIMMDY-MACE-HAT-plugin.git
-	branch = MACE_HAT
+	branch = feat/mace-barrier-v2
 [submodule "plugins/kimmdy-grappa"]
 	path = plugins/kimmdy-grappa
 	url = git@github.com:graeter-group/kimmdy-grappa.git
