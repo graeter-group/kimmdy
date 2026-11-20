@@ -456,7 +456,7 @@
               "type": "boolean",
               "pytype": "bool",
               "default": true,
-              "description": "Retype transferred HW/HO hydrogen atoms as a force-field LJ-bearing hydrogen type (H1 in Amber) in state B of the temporary relaxation topology. State A keeps the original type, so the H's Lennard-Jones parameters grow in linearly with lambda. The explicit relax pair terms of the moving H also use its original, size-free type in state A, unless the H lands on an oxygen again. The final reaction topology is unchanged."
+              "description": "In the temporary relaxation topology, hydrogens without Lennard-Jones parameters (HO or HW in Amber) get the force field's hydrogen type with the smallest Lennard-Jones size (H in Amber): a moving hydrogen (its bonded partners change) gets it in state A if its reactant type has no LJ size, and a changed hydrogen gets it in state B if its product type has none. Explicit relax pair terms and Morse bond lengths use this type for such hydrogens even when the option is off. Without an LJ core a moving hydrogen can collapse onto a charged atom, so KIMMDY logs a warning if one would still have none. The final reaction topology is unchanged."
             },
             "harmonic_acceptor_h_relax_term": {
               "type": "boolean",
@@ -493,7 +493,7 @@
             "break_plumed": {
               "type": "boolean",
               "deprecated": true,
-              "description": "Deprecated: PLUMED support will be removed in a future release. Whether to remove bonds from the plumed.dat input file when applying a reaction recipe that breaks a bond. Unless needed for performance optimization, this can be left at `false`, because the homolysis plugin in kimmdy-reactions also cheeckts to not break non-existing bonds by default (which can be turned off).",
+              "description": "Removed: has no effect. Bonds broken by a reaction recipe are no longer removed from the plumed.dat input file. Kept so that existing config files still load. PLUMED support will be removed in a future release.",
               "pytype": "bool",
               "default": false
             },
@@ -522,10 +522,57 @@
             },
             "conserve_transferred_h_charge": {
               "title": "Conserve transferred-H charge",
-              "description": "Opt in to keeping a transferred hydrogen's pre-transfer partial charge and subtracting it from the acceptor instead of restoring template charges. This also bypasses complete exact-ITP product restoration, including residue-wide atom types, masses and queued bonded parameters. When false, retain product-template restoration and use local charge balancing when no suitable charge template is available. Default: false",
+              "description": "Removed and ignored with a warning. Transferred hydrogens always get the charge of the residue template they fit, compensated on the acceptor (see changer.apply_recipe.charges).",
+              "deprecated": true,
+              "type": "boolean",
+              "pytype": "bool"
+            }
+          },
+          "additionalProperties": false
+        },
+        "apply_recipe": {
+          "title": "apply_recipe",
+          "type": "object",
+          "description": "Settings for the steps of applying a recipe. The steps run in recipe order. Each Relax ends a segment: the topology after the steps so far gets its partial charges and then its parameters, and the relaxation runs from the topology before the segment to it. Steps after the last Relax are finished the same way at the end, before the new topology is written.",
+          "properties": {
+            "charges": {
+              "title": "charges",
+              "type": "object",
+              "description": "Partial charges of the product topology, set once per recipe segment (the steps up to a Relax or the end of the recipe), after its topology changes and before the parameterization. A transferred hydrogen gets the charge of the residue template the acceptor residue fits (exact ITP match, or the rtp entries <name>, N<name> and C<name>, checked by atom names and charges) and the acceptor gives up exactly that charge; without a fitting template the one with the best atom-name match is used, and without any template the hydrogen keeps its old charge.",
+              "properties": {
+                "template_tolerance": {
+                  "title": "Template charge tolerance",
+                  "description": "Largest charge difference in e for which an atom still carries its template charge, and for which the residue charge change of a template counts as zero. Charges are written with 4 decimals, so 0.001 separates rounding from a real mismatch. Default: 0.001",
+                  "type": "number",
+                  "pytype": "float",
+                  "minimum": 0,
+                  "default": 0.001
+                },
+                "conservation_check": {
+                  "title": "Charge conservation check",
+                  "description": "What to do if a recipe changes the net charge of the reactive molecule by more than conservation_tolerance: warn, error (stop the run) or off. Default: warn",
+                  "type": "string",
+                  "pytype": "str",
+                  "enum": ["warn", "error", "off"],
+                  "default": "warn"
+                },
+                "conservation_tolerance": {
+                  "title": "Charge conservation tolerance",
+                  "description": "Largest change of the net charge of the reactive molecule in e that conservation_check accepts. Default: 0.001",
+                  "type": "number",
+                  "pytype": "float",
+                  "minimum": 0,
+                  "default": 0.001
+                }
+              },
+              "additionalProperties": false
+            },
+            "write_intermediate_topologies": {
+              "title": "Write intermediate topologies",
+              "description": "Write the topologies before and after the reaction (<top>_before.top, <top>_after.top) and, if a water takes part in it, the start of the slow growth with its temporary bonds (<top>_before_with_solvent_bonds.top) next to the relaxation topology, for debugging. Default: true",
               "type": "boolean",
               "pytype": "bool",
-              "default": false
+              "default": true
             }
           },
           "additionalProperties": false

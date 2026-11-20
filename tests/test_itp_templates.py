@@ -1,9 +1,11 @@
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
 from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
+from kimmdy.topology.utils import get_residue_by_bonding
 
 
 @pytest.fixture
@@ -46,11 +48,25 @@ def _hat_atoms(topology: Topology):
     return donor_h, donor, acceptor
 
 
+def _transfer(topology: Topology, donor_h, donor, acceptor) -> Topology:
+    """Move donor_h from donor to acceptor; returns the topology before (A)."""
+    top_a = deepcopy(topology)
+    topology.break_bond((donor.nr, donor_h.nr))
+    topology.bind_bond((acceptor.nr, donor_h.nr))
+    return top_a
+
+
+def _match_acceptor(topology: Topology, top_a: Topology, acceptor, donor_h):
+    """The ITP template of the acceptor's residue, which donor_h joined."""
+    residue = get_residue_by_bonding(acceptor, topology.atoms)
+    return topology.ff.templates.match_itp(
+        residue, {donor_h.nr}, topology.atoms, top_a.atoms
+    )
+
+
 def test_loads_closed_and_radical_plpc_templates(plpc_topology):
-    templates = plpc_topology.ff.product_templates.templates["PLPC"]
-    templates_by_moleculetype = {
-        template.moleculetype: template for template in templates
-    }
+    templates = plpc_topology.ff.templates.itp["PLPC"]
+    templates_by_moleculetype = {template.name: template for template in templates}
 
     assert set(templates_by_moleculetype) == {"PLPC", "PLPC_rad"}
 
@@ -64,38 +80,22 @@ def test_loads_closed_and_radical_plpc_templates(plpc_topology):
 
 def test_matches_hydrogenated_plpc_radical(plpc_topology):
     donor_h, donor, acceptor = _hat_atoms(plpc_topology)
+    top_a = _transfer(plpc_topology, donor_h, donor, acceptor)
 
-    plpc_topology.break_bond((donor.nr, donor_h.nr))
-    donor_h.residue = acceptor.residue
-    donor_h.resnr = acceptor.resnr
-
-    match = plpc_topology.ff.product_templates.match_hydrogenated_residue(
-        topology=plpc_topology,
-        acceptor=acceptor,
-        transferred_h=donor_h,
-    )
+    match = _match_acceptor(plpc_topology, top_a, acceptor, donor_h)
 
     assert match is not None
-    assert match.template.moleculetype == "PLPC"
-    assert match.transferred_h_id == donor_h.nr
-    assert match.acceptor_id == acceptor.nr
-    assert match.transferred_h_template_name == "H3X"
-    assert match.atom_mapping[donor_h.nr] == match.template.atoms["H3X"]
-    assert match.atom_mapping[acceptor.nr] == match.template.atoms["C33"]
+    assert match.template.name == "PLPC"
+    assert match.names[donor_h.nr] == "H3X"
+    assert match.names[acceptor.nr] == "C33"
 
 
 def test_rejects_template_when_existing_atom_type_differs(plpc_topology):
     donor_h, donor, acceptor = _hat_atoms(plpc_topology)
-    plpc_topology.break_bond((donor.nr, donor_h.nr))
-    donor_h.residue = acceptor.residue
-    donor_h.resnr = acceptor.resnr
+    top_a = _transfer(plpc_topology, donor_h, donor, acceptor)
     acceptor.type = "CTL3"
 
-    match = plpc_topology.ff.product_templates.match_hydrogenated_residue(
-        topology=plpc_topology,
-        acceptor=acceptor,
-        transferred_h=donor_h,
-    )
+    match = _match_acceptor(plpc_topology, top_a, acceptor, donor_h)
 
     assert match is None
 
@@ -105,7 +105,7 @@ def test_rejects_template_with_unknown_atomtype(plpc_topology):
     known_atomtypes.pop("HAL2")
 
     with pytest.raises(ValueError, match="atom type 'HAL2'.*missing"):
-        plpc_topology.ff.product_templates.validate_atomtypes(known_atomtypes)
+        plpc_topology.ff.templates.validate_atomtypes(known_atomtypes)
 
 
 def test_rejects_unknown_product_template_source():
@@ -140,28 +140,22 @@ def _ohr_transition_atoms(topology: Topology):
 
 
 def _prepare_ohr_transition(topology: Topology):
+    """Move H2 from the water-like OHRH to the OHR radical; returns A and the atoms."""
     donor_h, donor, acceptor = _ohr_transition_atoms(topology)
-    topology.break_bond((donor.nr, donor_h.nr))
-    donor_h.residue = acceptor.residue
-    donor_h.resnr = acceptor.resnr
-    return donor_h, donor, acceptor
+    top_a = _transfer(topology, donor_h, donor, acceptor)
+    return top_a, donor_h, donor, acceptor
 
 
 def test_configured_transition_allows_exact_ohr_type_conversion(ohr_topology):
-    donor_h, _donor, acceptor = _prepare_ohr_transition(ohr_topology)
+    top_a, donor_h, _donor, acceptor = _prepare_ohr_transition(ohr_topology)
 
-    match = ohr_topology.ff.product_templates.match_hydrogenated_residue(
-        topology=ohr_topology,
-        acceptor=acceptor,
-        transferred_h=donor_h,
-    )
+    match = _match_acceptor(ohr_topology, top_a, acceptor, donor_h)
 
     assert match is not None
-    assert match.template.moleculetype == "OHRH"
-    assert match.transferred_h_template_name == "H2"
+    assert match.template.name == "OHRH"
+    assert match.names[donor_h.nr] == "H2"
     mapped_by_name = {
-        template_atom.name: template_atom.atom_type
-        for template_atom in match.atom_mapping.values()
+        name: match.template.atoms[name].type for name in match.names.values()
     }
     assert mapped_by_name == {"O1": "OT", "H1": "HT", "H2": "HT"}
 
@@ -174,26 +168,19 @@ def test_ohr_type_conversion_remains_disabled_without_transition():
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
     )
-    donor_h, _donor, acceptor = _prepare_ohr_transition(topology)
+    top_a, donor_h, _donor, acceptor = _prepare_ohr_transition(topology)
 
-    match = topology.ff.product_templates.match_hydrogenated_residue(
-        topology=topology,
-        acceptor=acceptor,
-        transferred_h=donor_h,
-    )
+    match = _match_acceptor(topology, top_a, acceptor, donor_h)
 
     assert match is None
 
 
 def test_configured_transition_requires_exact_precursor(ohr_topology):
-    donor_h, _donor, acceptor = _prepare_ohr_transition(ohr_topology)
-    acceptor.type = "OT"
+    top_a, donor_h, _donor, acceptor = _prepare_ohr_transition(ohr_topology)
+    # the precursor is the residue before the transfer (A)
+    top_a.atoms[acceptor.nr].type = "OT"
 
-    match = ohr_topology.ff.product_templates.match_hydrogenated_residue(
-        topology=ohr_topology,
-        acceptor=acceptor,
-        transferred_h=donor_h,
-    )
+    match = _match_acceptor(ohr_topology, top_a, acceptor, donor_h)
 
     assert match is None
 
