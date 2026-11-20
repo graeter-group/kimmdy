@@ -813,7 +813,6 @@ class MoleculeType:
             new_angles[(angle.ai, angle.aj, angle.ak)] = angle
         self.angles = new_angles
 
-        new_pairs = {}
         new_multiple_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
             new_dihedrals = {}
@@ -824,17 +823,6 @@ class MoleculeType:
             # drop dihedrals to a deleted atom
             if None in (ai, aj, ak, al):
                 continue
-
-            # do pairs before the dihedrals are updated
-            pair = self.pairs.pop((dihedrals.ai, dihedrals.al), None)
-            if pair is not None:
-                pair_ai = update_map.get(pair.ai)
-                pair_aj = update_map.get(pair.aj)
-
-                if None not in (pair_ai, pair_aj):
-                    pair.ai = pair_ai  # type: ignore (pyright bug)
-                    pair.aj = pair_aj  # type: ignore
-                    new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore
             dihedrals.aj = aj  # type: ignore
@@ -859,6 +847,20 @@ class MoleculeType:
             ] = dihedrals
 
         self.proper_dihedrals = new_multiple_dihedrals
+
+        # pairs are reindexed on their own: their key keeps the atom order of
+        # the topology file, which need not match the order of the end atoms
+        # of their dihedrals (e.g. pair 3 10 for dihedral 10 8 6 3)
+        new_pairs = {}
+        for pair in self.pairs.values():
+            ai = update_map.get(pair.ai)
+            aj = update_map.get(pair.aj)
+            # drop pairs to a deleted atom
+            if ai is None or aj is None:
+                continue
+            pair.ai = ai
+            pair.aj = aj
+            new_pairs[(ai, aj)] = pair
         self.pairs = new_pairs
 
         new_multiple_dihedrals = {}
@@ -1641,6 +1643,8 @@ class Topology:
                 reactive_moleculetype.proper_dihedrals.pop(key, None)
                 pairkey: tuple[str, str] = tuple(sorted((key[0], key[3]), key=int))  # type: ignore
                 reactive_moleculetype.pairs.pop(pairkey, None)
+                # pairs keep the atom order of the topology file
+                reactive_moleculetype.pairs.pop(pairkey[::-1], None)
 
         # and improper dihedrals
         keys_remove = []
