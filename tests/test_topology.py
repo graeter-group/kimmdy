@@ -443,6 +443,40 @@ class TestTopology:
                 assert new_d.ak == update.get(old_d.ak)
                 assert new_d.al == update.get(old_d.al)
 
+    def test_reindex_no_change_keeps_pairs(self, hexala_top_fix: Topology):
+        org_top: Topology = deepcopy(hexala_top_fix)
+        hexala_top_fix.reindex_atomnrs()
+        assert org_top.pairs == hexala_top_fix.pairs
+
+    @pytest.mark.parametrize("atomindex", ["2", "8", "40", "72"])
+    def test_del_atom_hexala_pairs(self, hexala_top_fix: Topology, atomindex):
+        """Deleting a hydrogen only removes the pairs it is part of.
+
+        hexala.top has dihedrals whose first atom has the higher id
+        (e.g. 10 8 6 3), while their pairs are written lower id first.
+        """
+        top: Topology = deepcopy(hexala_top_fix)
+        assert top.atoms[atomindex].type.startswith("H")
+        update = top.del_atom(atomindex, parameterize=False)
+        expected = {
+            (update[ai], update[aj])
+            for ai, aj in hexala_top_fix.pairs
+            if atomindex not in (ai, aj)
+        }
+        assert set(top.pairs.keys()) == expected
+        for (ai, aj), pair in top.pairs.items():
+            assert (pair.ai, pair.aj) == (ai, aj)
+
+    def test_del_atom_keeps_reversed_pair(self, hexala_top_fix: Topology):
+        """A pair written as 'higher lower' survives reindexing."""
+        top: Topology = deepcopy(hexala_top_fix)
+        key = next(k for k in top.pairs if int(k[0]) > 2 and int(k[1]) > 2)
+        pair = top.pairs.pop(key)
+        pair.ai, pair.aj = pair.aj, pair.ai
+        top.pairs[(pair.ai, pair.aj)] = pair
+        update = top.del_atom("2", parameterize=False)
+        assert (update[key[1]], update[key[0]]) in top.pairs
+
     def test_break_bind_bond_hexala(self, hexala_top_fix: Topology):
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
