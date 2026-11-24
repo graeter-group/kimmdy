@@ -7,13 +7,14 @@ import pytest
 from hypothesis import HealthCheck, Phase, given, settings
 from hypothesis import strategies as st
 
-from kimmdy.parsing import TopologyDict, read_top
+from kimmdy.parsing import TopologyDict, empty_section, read_top, write_top
 from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
 from kimmdy.topology.charges import assign_recipe_charges
 from kimmdy.topology.templates import assign_recipe_names
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.utils import (
+    attributes_to_list,
     get_protein_section,
     get_reactive_section,
     get_residue_by_bonding,
@@ -1798,3 +1799,37 @@ class TestResidueImpropers:
         mol.update_residue_impropers([residue], top.ff)
 
         assert key in mol.improper_dihedrals
+
+
+def test_attributes_to_list_flattens_position_restraint_fc():
+    """The force constants of a position restraint are three fields of the line, not one tuple."""
+    restraint = PositionRestraint.from_top_line(["7", "1", "1000", "500", "0"])
+    assert attributes_to_list(restraint) == ["7", "1", "1000", "500", "0"]
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_position_restraints_survive_write_top(arranged_tmp_path):
+    """Plain [ position_restraints ] of a reactive molecule survive read_top -> Topology -> write_top.
+
+    The restraints go through the merge into the Reactive moleculetype and are written back
+    unconditionally and unchanged (before, write_top failed with a TypeError on the fc tuple).
+    """
+    lines = [["1", "1", "1000", "1000", "1000"], ["5", "1", "1000", "1000", "0"]]
+    raw = read_top(Path("AlaCaR_out.top"))
+    mol = next(key for key in raw if key.startswith("moleculetype_"))
+    section = empty_section()
+    section["content"] = deepcopy(lines)
+    raw[mol]["subsections"]["position_restraints"] = section
+
+    top = Topology(raw)
+    assert sorted(top.position_restraints) == ["1", "5"]
+    assert top.position_restraints["5"].fc == ("1000", "1000", "0")
+
+    write_top(top.to_dict(), Path("posres_out.top"))
+    written = read_top(Path("posres_out.top"))
+    out = written[f"moleculetype_{REACTIVE_MOLECULEYPE}"]["subsections"][
+        "position_restraints"
+    ]
+    assert out["condition"] is None
+    assert out["content"] == lines
+    assert Topology(written).position_restraints.keys() == top.position_restraints.keys()
