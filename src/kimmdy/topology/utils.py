@@ -203,13 +203,22 @@ def set_reactive_section(top: dict, name: str, value: list) -> Optional[list[lis
 
 
 def attributes_to_list(obj) -> list[str]:
+    """Fields of an atomic object as one topology line.
+
+    Tuple attributes (PositionRestraint.fc = (fcx, fcy, fcz)) are written as
+    their single fields; before, the tuple itself ended up in the line and
+    write_top failed with a TypeError in " ".join.
+    """
     attrs = []
     for k, v in obj.__dict__.items():
         if k in ["bound_to_nrs", "is_radical", "id", "id_sym"]:
             continue
         if v in [None, ""]:
             continue
-        attrs.append(v)
+        if isinstance(v, tuple):
+            attrs.extend(v)
+        else:
+            attrs.append(v)
     return attrs
 
 

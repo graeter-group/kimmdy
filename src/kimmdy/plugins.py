@@ -121,6 +121,7 @@ class BasicParameterizer(Parameterizer):
         self, current_topology: Topology, focus_nrs: Optional[set[str]] = None
     ) -> Topology:
         """Do nothing,
-        all necessary actions should already have happened in bind_bond and break_bond of Topology
+        all necessary actions should already have happened in bind_bond and break_bond
+        of Topology and, for names, types and improper dihedrals, in Topology.update_names_LJ
         """
         return current_topology

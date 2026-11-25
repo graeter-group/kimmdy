@@ -54,6 +54,17 @@ original behaviour.
 
 ### Bug Fixes
 
+* Homolysis uses explicit bond parameters. Bond forces and rates took `b0`
+  and `kb` only from the force field bondtypes of the atom types, so
+  parameters written on a `[ bonds ]` line were ignored. A bond with
+  explicit harmonic parameters (funct 1) now uses them; a bond with explicit
+  Morse parameters (funct 3) gets its force from its own Morse potential
+  (`b0`, `D`, `beta`) and `kb = 2*D*beta^2` for the rate, whose barrier
+  still uses the edissoc dissociation energy. Other bonds fall back to the
+  bondtypes as before. The plugin logs how many bonds use which source.
+  Bondstats cached before this change keep their old forces; set
+  `recompute_bondstats: true` to recompute them.
+  Files: `src/kimmdy/plugin_utils.py`, `plugins/kimmdy-reactions/src/homolysis/reaction.py`.
 * Restart inside an unfinished task no longer crashes on the force-field
   links. `create_task_directory` checked `exists()`, which is False for a link
   that points to nothing (a force field without `residuetypes.dat`), so
