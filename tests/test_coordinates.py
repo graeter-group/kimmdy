@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 import copy
 import multiprocessing as mp
 import logging
@@ -8,7 +9,7 @@ from pathlib import Path
 import MDAnalysis as mda
 from kimmdy.recipe import Break, Place
 from kimmdy.parsing import read_plumed, read_top, write_top
-from kimmdy.constants import DEFAULT_EDISSOC, REACTIVE_MOLECULEYPE
+from kimmdy.constants import REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import Angle, Bond, BondType, Dihedral, Pair
@@ -50,6 +51,33 @@ def test_merge_harmonic_to_urey_bradley_angle():
         "0.245",
         "5000.0",
     )
+
+
+def test_implicit_interactions_ignore_generated_pairs():
+    """A pair without numbers blocks the transferred-H retyping only when the force field does not generate pairs."""
+    merger = object.__new__(MoleculeTypeMerger)
+    merger.mol_a = SimpleNamespace(
+        bonds={("1", "2"): Bond("1", "2", funct="1", c0="0.0960", c1="462750.0")},
+        angles={},
+        proper_dihedrals={},
+        improper_dihedrals={},
+        pairs={("2", "5"): Pair("2", "5", funct="1")},
+    )
+
+    # gen-pairs = yes: grompp builds the pair from the atom types, retyping is safe
+    merger.ff = SimpleNamespace(defaults=[["1", "2", "yes", "0.5", "0.8333"]])
+    assert merger._implicit_interactions("2") == []
+
+    # gen-pairs = no (or missing): the pair needs a [ pairtypes ] entry, keep blocking
+    merger.ff = SimpleNamespace(defaults=[["1", "2", "no", "0.5", "0.8333"]])
+    assert merger._implicit_interactions("2") == ["pair 2-5"]
+    merger.ff = SimpleNamespace(defaults=[["1", "2"]])
+    assert merger._implicit_interactions("2") == ["pair 2-5"]
+
+    # a bond without numbers still blocks, whatever gen-pairs says
+    merger.ff = SimpleNamespace(defaults=[["1", "2", "yes", "0.5", "0.8333"]])
+    merger.mol_a.bonds[("1", "2")] = Bond("1", "2", funct="1")
+    assert merger._implicit_interactions("2") == ["bond 1-2"]
 
 
 def test_get_explicit_MultipleDihedrals(arranged_tmp_path):
@@ -184,11 +212,9 @@ def test_morse_parameters(arranged_tmp_path):
     assert atomtypes_a == ("CT", "H")
     assert atomtypes_b == ("CT", "H1")
 
-    depth_a, beta_a = merger._get_morse_parameters(atomtypes=atomtypes_a, bond=bond_a)
-    depth_b, beta_b = merger._get_morse_parameters(atomtypes=atomtypes_b, bond=bond_b)
-    type_key: tuple[str, str] = tuple(sorted(atomtypes_b))  # type: ignore
-    d = DEFAULT_EDISSOC.get(type_key)
-    assert d is None
+    depth_a, beta_a = merger._get_morse_parameters(bond=bond_a)
+    depth_b, beta_b = merger._get_morse_parameters(bond=bond_b)
+    # always the default well depth
     assert depth_a == 300
     assert depth_b == 300
 

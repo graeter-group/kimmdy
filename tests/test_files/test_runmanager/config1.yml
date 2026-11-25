@@ -6,6 +6,7 @@ top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'
 plumed: 'plumed.dat'
+edissoc_kimmdy: 'edissoc_kimmdy.dat'
 mds:
   equilibrium1:
     mdp: 'pullf1500_equil.mdp'

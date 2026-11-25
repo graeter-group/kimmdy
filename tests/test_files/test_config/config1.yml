@@ -4,7 +4,7 @@ out: 'test_config_1'
 gromacs_alias: 'gmx'
 top: 'topol.top'
 gro: 'npt.gro'
-edissoc: 'edissoc.dat'
+edissoc_kimmdy: 'edissoc_kimmdy.dat'
 ndx: 'index_backbone.ndx'
 plumed: 'plumed.dat'
 mds:

@@ -9,7 +9,7 @@ R = 8.31446261815324e-3  # [kJ K-1 mol-1]
 KB = 1.380649e-23  # [J K-1]
 H_PLANCK = 6.62607015e-34  # [J s]
 
-OPTIONAL_CONFIG_PATHS = ["config.edissoc"]
+OPTIONAL_CONFIG_PATHS = []
 """Paths that may or may not be defined in the input
 config and are thus not meant to be checked for existence
 or only checked if they are using in conjunction with a certain plugin/option.
@@ -53,20 +53,11 @@ ATOM_ID_FIELDS = {
     "dihedral_restraints": [0, 1, 2, 3],
 }
 
-# from gmx data dir
-DEFAULT_EDISSOC: dict[tuple[str, str], float] = {  # type: ignore
-    tuple(sorted(list(k))): v
-    for k, v in {
-        ("C", "N"): 500.0,
-        ("CA", "C"): 341.0,
-        ("CA", "N"): 379.0,
-        ("CA", "CB"): 400.0,
-        ("CB", "CG"): 400.0,
-        ("CG", "CD"): 400.0,
-        ("CD", "CE"): 400.0,
-        ("CE", "NZ"): 400.0,
-    }.items()
-}
+FALLBACK_EDISSOC = 400.0  # [kJ mol-1]
+"""Dissociation energy used by reaction plugins when the edissoc_kimmdy file
+is missing or has no entry for a bond. Close to typical single bonds between
+heavy atoms.
+"""
 
 # see https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html
 FFFUNC = {

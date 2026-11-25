@@ -215,3 +215,29 @@ def test_bondstats_from_trajectory_hexala_backbone(arranged_tmp_path):
         assert s["mean_d"] == pytest.approx(expected / 10, abs=1e-3)
         assert s["plumed_id"] == f"{ai}-{aj}"
         assert s["delta_d"] == pytest.approx(s["mean_d"] - s["b0"])
+
+
+@pytest.mark.parametrize(
+    "arranged_tmp_path", ["test_integration/hexalanine_homolysis"], indirect=True
+)
+def test_bondstats_without_edissoc_warns_once(arranged_tmp_path, caplog, monkeypatch):
+    monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
+    caplog.set_level(logging.WARNING, logger="kimmdy.plugin_utils")
+    top = Topology(read_top(Path("hexala_out.top")))
+    gro = Path("npt.gro")
+    structure = mda.Universe(str(gro))
+    xtc = arranged_tmp_path / "traj.xtc"
+    with mda.Writer(str(xtc), structure.atoms.n_atoms) as w:
+        for _ in range(2):
+            w.write(structure.atoms)
+
+    u = plugin_utils.load_trajectory_universe(gro, xtc, compressed_group="System")
+    atom_nrs = plugin_utils.atom_nrs_from_selection(u, "backbone")
+    bonds = plugin_utils.select_bonds(
+        top=top, atom_nrs=atom_nrs, exclude=["C-N", "H*", "O*"]
+    )
+    plugin_utils.calculate_bondstats_from_trajectory(top, u, bonds)
+
+    warnings = [r for r in caplog.records if "No edissoc file given" in r.message]
+    assert len(warnings) == 1
+    assert "400.0 kJ/mol" in warnings[0].message

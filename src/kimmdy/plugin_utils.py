@@ -8,7 +8,7 @@ import MDAnalysis as mda
 import numpy as np
 from MDAnalysis.lib.distances import calc_bonds
 
-from kimmdy.constants import H_PLANCK, KB, R
+from kimmdy.constants import FALLBACK_EDISSOC, H_PLANCK, KB, R
 from kimmdy.parsing import Plumed_dict, read_distances_dat, read_edissoc, read_plumed
 from kimmdy.topology.atomic import BondId
 from kimmdy.topology.topology import Topology
@@ -200,6 +200,9 @@ def get_bondstats(
     if edissoc_dat is not None:
         edissoc = read_edissoc(edissoc_dat)
     else:
+        logger.warning(
+            f"No edissoc file given, using {FALLBACK_EDISSOC} kJ/mol as dissociation energy for all bonds."
+        )
         edissoc = None
 
     stats: BondStats = {}
@@ -239,9 +242,9 @@ def _stats_for_bond(
             atomnames=[ai.atom, aj.atom], edissoc=edissoc, residue=ai.residue
         )
     else:
-        m = f"Could not find dissociation energy for atoms with ids {ai.nr} and {aj.nr}. Using default."
+        m = f"Could not find dissociation energy for atoms with ids {ai.nr} and {aj.nr}. Using default of {FALLBACK_EDISSOC}."
         logger.debug(m)
-        edis = 500
+        edis = FALLBACK_EDISSOC
 
     mean_d = float(np.mean(ds))
 
@@ -414,7 +417,13 @@ def calculate_bondstats_from_trajectory(
         m = "No trajectory frames found for calculating bond statistics."
         logger.error(m)
         raise ValueError(m)
-    edissoc = read_edissoc(edissoc_dat) if edissoc_dat is not None else None
+    if edissoc_dat is not None:
+        edissoc = read_edissoc(edissoc_dat)
+    else:
+        logger.warning(
+            f"No edissoc file given, using {FALLBACK_EDISSOC} kJ/mol as dissociation energy for all bonds."
+        )
+        edissoc = None
 
     stats: BondStats = {}
     for i, bondkey in enumerate(bonds):
@@ -695,8 +704,8 @@ def get_edissoc_from_atomnames(
     except KeyError:
         # continue with guessed edissoc
         logger.warning(
-            f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of 400.0"
+            f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of {FALLBACK_EDISSOC}"
         )
-        E_dis = 400.0
+        E_dis = FALLBACK_EDISSOC
 
     return E_dis
